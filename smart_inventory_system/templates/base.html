@@ -109,10 +109,7 @@
             <li class="nav-item">
                 <a class="nav-link {% if request.blueprint == 'notifications' %}active{% endif %}" href="{{ url_for('notifications.index') }}">
                     <i class="fa-solid fa-bell"></i>
-                    <span>Notifications</span>
-                    {% if unread_notifications_count > 0 %}
-                    <span class="badge bg-danger ms-auto">{{ unread_notifications_count }}</span>
-                    {% endif %}
+                    <span>System Alerts</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -154,23 +151,28 @@
             </div>
 
             <div class="navbar-actions">
+                <!-- Live Operational Status Indicator -->
+                <div class="system-status-pill d-none d-md-flex" title="Warehouse telemetry live">
+                    <span class="status-dot-pulse"></span>
+                    <span>System Online</span>
+                </div>
+
+                <!-- Quick Search Spotlight Trigger -->
+                <button class="quick-search-trigger d-none d-sm-inline-flex" id="quickSearchBtn" type="button" data-bs-toggle="modal" data-bs-target="#spotlightModal" aria-label="Quick Search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>Quick Jump...</span>
+                    <kbd>Ctrl K</kbd>
+                </button>
+
                 <!-- Dark / Light Theme Toggle -->
                 <button class="theme-toggle-btn" id="themeToggle" type="button" aria-label="Toggle Dark/Light Mode" title="Toggle Theme">
                     <i class="fa-solid fa-moon"></i>
                 </button>
 
-                <!-- Notifications Bell -->
-                <a href="{{ url_for('notifications.index') }}" class="notification-badge" title="Notifications">
-                    <i class="fa-regular fa-bell"></i>
-                    {% if unread_notifications_count > 0 %}
-                    <span class="badge-counter">{{ unread_notifications_count }}</span>
-                    {% endif %}
-                </a>
-
-                <!-- User Dropdown -->
+                <!-- User Profile Dropdown -->
                 <div class="dropdown">
                     <button class="user-profile-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="avatar-circle" style="width: 24px; height: 24px; font-size: 0.7rem;">
+                        <div class="avatar-circle" style="width: 26px; height: 26px; font-size: 0.75rem;">
                             {{ current_user.full_name[:1] if current_user else 'U' }}
                         </div>
                         <span>{{ current_user.username if current_user else 'Guest' }}</span>
@@ -178,6 +180,7 @@
                     <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
                         <li><h6 class="dropdown-header">{{ current_user.role if current_user else 'Account' }}</h6></li>
                         <li><a class="dropdown-item" href="{{ url_for('settings.index') }}"><i class="fa-solid fa-gear me-2 text-muted"></i>Settings</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('notifications.index') }}"><i class="fa-solid fa-clock-rotate-left me-2 text-muted"></i>System Alert Log</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign Out</a></li>
                     </ul>
@@ -185,15 +188,25 @@
             </div>
         </header>
 
-        <!-- Flash Messages -->
-        <div class="px-3 px-md-4 pt-3 no-print">
+        <!-- Floating Toast Notification System (Zero Layout Shift, Modern & Clean) -->
+        <div class="toast-container-modern no-print" id="toastContainer">
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
-                            <i class="fa-solid {% if category == 'success' %}fa-circle-check{% elif category == 'danger' %}fa-triangle-exclamation{% elif category == 'warning' %}fa-circle-exclamation{% else %}fa-circle-info{% endif %} me-2"></i>
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <div class="toast-modern toast-{{ category }}" role="alert">
+                            <div class="toast-icon">
+                                <i class="fa-solid {% if category == 'success' %}fa-circle-check{% elif category == 'danger' %}fa-circle-exclamation{% elif category == 'warning' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+                            </div>
+                            <div class="toast-body">
+                                <div class="toast-title">
+                                    {% if category == 'success' %}Success{% elif category == 'danger' %}System Alert{% elif category == 'warning' %}Notice{% else %}Information{% endif %}
+                                </div>
+                                <div class="toast-msg">{{ message }}</div>
+                            </div>
+                            <button type="button" class="toast-close" onclick="this.closest('.toast-modern').remove();" aria-label="Close">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                            <div class="toast-progress"></div>
                         </div>
                     {% endfor %}
                 {% endif %}
@@ -210,6 +223,107 @@
             <span>&copy; {{ now.year }} SmartLogix - Inventory & Logistics Management System.</span>
             <span><i class="fa-solid fa-shield-halved text-primary me-1"></i> Secured Role-Based System</span>
         </footer>
+    </div>
+</div>
+
+<!-- Quick Jump Spotlight Modal (Ctrl+K) -->
+<div class="modal fade spotlight-modal" id="spotlightModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="spotlight-input-wrap">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" class="spotlight-input" id="spotlightInput" placeholder="Quick jump to product, section, or action..." autocomplete="off">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="spotlight-results" id="spotlightResults">
+                <div class="spotlight-category-title">System Sections</div>
+                <a href="{{ url_for('dashboard.index') }}" class="spotlight-item">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <div class="spotlight-item-text">
+                        <div class="spotlight-item-title">Dashboard Command Center</div>
+                        <div class="spotlight-item-desc">Metrics, real-time trends, and activity</div>
+                    </div>
+                    <span class="badge bg-light text-muted border">Overview</span>
+                </a>
+                <a href="{{ url_for('inventory.index') }}" class="spotlight-item">
+                    <i class="fa-solid fa-box"></i>
+                    <div class="spotlight-item-text">
+                        <div class="spotlight-item-title">Products & Inventory Catalog</div>
+                        <div class="spotlight-item-desc">Live inventory quantities, SKU tracking, and filters</div>
+                    </div>
+                    <span class="badge bg-light text-muted border">Catalog</span>
+                </a>
+                <a href="{{ url_for('incoming.index') }}" class="spotlight-item">
+                    <i class="fa-solid fa-truck-ramp-box"></i>
+                    <div class="spotlight-item-text">
+                        <div class="spotlight-item-title">Incoming Goods Receipts</div>
+                        <div class="spotlight-item-desc">Received batches and supplier restock history</div>
+                    </div>
+                    <span class="badge bg-light text-muted border">Receiving</span>
+                </a>
+                <a href="{{ url_for('dispatch.index') }}" class="spotlight-item">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <div class="spotlight-item-text">
+                        <div class="spotlight-item-title">Goods Dispatch Orders</div>
+                        <div class="spotlight-item-desc">Shipments, client orders, and transporter status</div>
+                    </div>
+                    <span class="badge bg-light text-muted border">Logistics</span>
+                </a>
+                <a href="{{ url_for('locations.index') }}" class="spotlight-item">
+                    <i class="fa-solid fa-warehouse"></i>
+                    <div class="spotlight-item-text">
+                        <div class="spotlight-item-title">Storage Locations Grid</div>
+                        <div class="spotlight-item-desc">Warehouse racks, aisles, capacity, and slot allocation</div>
+                    </div>
+                    <span class="badge bg-light text-muted border">Warehouse</span>
+                </a>
+                <a href="{{ url_for('expiry.index') }}" class="spotlight-item">
+                    <i class="fa-solid fa-calendar-xmark text-danger"></i>
+                    <div class="spotlight-item-text">
+                        <div class="spotlight-item-title">Expiry & Perishables Tracker</div>
+                        <div class="spotlight-item-desc">Monitor shelf life, expired lots, and safety intervals</div>
+                    </div>
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Critical</span>
+                </a>
+                <a href="{{ url_for('reports.index') }}" class="spotlight-item">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <div class="spotlight-item-text">
+                        <div class="spotlight-item-title">Executive Reports & CSV Analytics</div>
+                        <div class="spotlight-item-desc">Valuation reports, ledger audits, and exports</div>
+                    </div>
+                    <span class="badge bg-light text-muted border">Analytics</span>
+                </a>
+                <div class="spotlight-category-title mt-2">Quick Actions</div>
+                <a href="{{ url_for('inventory.add') }}" class="spotlight-item">
+                    <i class="fa-solid fa-plus-circle text-primary"></i>
+                    <div class="spotlight-item-text">
+                        <div class="spotlight-item-title">Add New Product</div>
+                        <div class="spotlight-item-desc">Create SKU, set prices, and map location</div>
+                    </div>
+                    <span class="badge bg-primary text-white">Create</span>
+                </a>
+                <a href="{{ url_for('incoming.add') }}" class="spotlight-item">
+                    <i class="fa-solid fa-cart-plus text-info"></i>
+                    <div class="spotlight-item-text">
+                        <div class="spotlight-item-title">Receive Stock Batch</div>
+                        <div class="spotlight-item-desc">Log arriving supplier units</div>
+                    </div>
+                    <span class="badge bg-info text-dark">Restock</span>
+                </a>
+                <a href="{{ url_for('dispatch.create') }}" class="spotlight-item">
+                    <i class="fa-solid fa-truck-fast text-success"></i>
+                    <div class="spotlight-item-text">
+                        <div class="spotlight-item-title">Create Outbound Dispatch</div>
+                        <div class="spotlight-item-desc">Generate delivery order and assign carrier</div>
+                    </div>
+                    <span class="badge bg-success text-white">Ship</span>
+                </a>
+            </div>
+            <div class="spotlight-footer">
+                <span>Navigate: <kbd class="px-1 border bg-light text-muted small rounded">↑</kbd> <kbd class="px-1 border bg-light text-muted small rounded">↓</kbd> to select &bull; <kbd class="px-1 border bg-light text-muted small rounded">Enter</kbd> to jump</span>
+                <span>Press <kbd class="px-1 border bg-light text-muted small rounded">Esc</kbd> to close</span>
+            </div>
+        </div>
     </div>
 </div>
 

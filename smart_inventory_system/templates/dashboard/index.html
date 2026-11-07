@@ -79,7 +79,7 @@
             <div class="stat-info">
                 <div class="stat-label">Total Dispatched Goods</div>
                 <div class="stat-value">{{ "{:,}".format(total_dispatched_qty) }}</div>
-                <div class="stat-desc"><a href="{{ url_for('dispatch.index') }}" class="text-decoration-none text-dark">Track deliveries &rarr;</a></div>
+                <div class="stat-desc"><a href="{{ url_for('dispatch.index') }}" class="text-decoration-none text-primary">Track deliveries &rarr;</a></div>
             </div>
         </div>
     </div>
@@ -212,15 +212,15 @@
         </div>
     </div>
 
-    <!-- Critical Low Stock Alert Table -->
+    <!-- Critical Low Stock Queue Table -->
     <div class="col-lg-8 col-md-12">
         <div class="card-modern h-100">
             <div class="card-header-modern">
                 <div class="d-flex align-items-center gap-2">
-                    <i class="fa-solid fa-triangle-exclamation text-warning"></i>
-                    <h6 class="mb-0">Low Stock Warning Alert (< Threshold)</h6>
+                    <i class="fa-solid fa-boxes-packing text-primary"></i>
+                    <h6 class="mb-0">Priority Replenishment Queue (&le; Minimum Threshold)</h6>
                 </div>
-                <a href="{{ url_for('inventory.index', stock='low') }}" class="small text-decoration-none">View All Low Stock</a>
+                <a href="{{ url_for('inventory.index', stock='low') }}" class="small text-decoration-none">View All Needed Restocks</a>
             </div>
             <div class="table-responsive">
                 <table class="table-modern">

@@ -9,14 +9,36 @@ document.addEventListener('DOMContentLoaded', function () {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
-    // 2. Auto-dismiss alerts after 5 seconds
-    setTimeout(function () {
-        const alerts = document.querySelectorAll('.alert-dismissible');
-        alerts.forEach(function (alert) {
-            const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
-            bsAlert.close();
+    // 2. Modern Floating Toast Lifecycle Handler
+    const toasts = document.querySelectorAll('.toast-modern');
+    toasts.forEach(function (toast) {
+        let dismissTimer = setTimeout(function () {
+            dismissToast(toast);
+        }, 4500);
+
+        // Pause timer on hover, resume on mouse leave
+        toast.addEventListener('mouseenter', function () {
+            clearTimeout(dismissTimer);
+            const progress = toast.querySelector('.toast-progress');
+            if (progress) progress.style.animationPlayState = 'paused';
         });
-    }, 5500);
+
+        toast.addEventListener('mouseleave', function () {
+            const progress = toast.querySelector('.toast-progress');
+            if (progress) progress.style.animationPlayState = 'running';
+            dismissTimer = setTimeout(function () {
+                dismissToast(toast);
+            }, 2500);
+        });
+    });
+
+    function dismissToast(toast) {
+        if (!toast || toast.classList.contains('toast-closing')) return;
+        toast.classList.add('toast-closing');
+        setTimeout(function () {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 320);
+    }
 
     // 3. Theme Toggle (Light / Dark Mode)
     const themeToggleBtn = document.getElementById('themeToggle');
@@ -134,5 +156,56 @@ document.addEventListener('DOMContentLoaded', function () {
             if (prodNameSpan) prodNameSpan.textContent = productName;
             if (locationSelect && currentLocationId) locationSelect.value = currentLocationId;
         });
+    }
+
+    // 6. Quick Jump Spotlight Command Palette (Ctrl + K)
+    const spotlightModalEl = document.getElementById('spotlightModal');
+    const spotlightInput = document.getElementById('spotlightInput');
+    const spotlightResults = document.getElementById('spotlightResults');
+
+    if (spotlightModalEl && spotlightInput) {
+        // Global Keyboard Shortcut: Ctrl + K or Cmd + K
+        document.addEventListener('keydown', function (e) {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                const modal = bootstrap.Modal.getOrCreateInstance(spotlightModalEl);
+                modal.show();
+            }
+        });
+
+        // Autofocus input when modal opens
+        spotlightModalEl.addEventListener('shown.bs.modal', function () {
+            spotlightInput.value = '';
+            filterSpotlightItems('');
+            spotlightInput.focus();
+        });
+
+        // Filter items on input
+        spotlightInput.addEventListener('input', function () {
+            filterSpotlightItems(spotlightInput.value.trim().toLowerCase());
+        });
+
+        function filterSpotlightItems(query) {
+            if (!spotlightResults) return;
+            const items = spotlightResults.querySelectorAll('.spotlight-item');
+            const categories = spotlightResults.querySelectorAll('.spotlight-category-title');
+            
+            let visibleCount = 0;
+            items.forEach(function (item) {
+                const title = (item.querySelector('.spotlight-item-title')?.textContent || '').toLowerCase();
+                const desc = (item.querySelector('.spotlight-item-desc')?.textContent || '').toLowerCase();
+                if (!query || title.includes(query) || desc.includes(query)) {
+                    item.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Toggle category titles
+            categories.forEach(function (cat) {
+                cat.style.display = query ? 'none' : 'block';
+            });
+        }
     }
 });
