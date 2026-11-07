@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}Storage Location Tracking{% endblock %}
+{% block page_title %}Warehouse Storage Locations & Slot Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Goods Location & Warehouse Slot Architecture</h4>
+        <p class="text-muted small mb-0">Locate goods across Warehouses, Sections, Racks, and Shelf levels.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addLocationModal">
+            <i class="fa-solid fa-plus me-1"></i> Add Storage Slot
+        </button>
+    </div>
+</div>
+
+<!-- Search & Warehouse Filter -->
+<div class="card-modern mb-4">
+    <div class="card-body-modern">
+        <form method="GET" action="{{ url_for('locations.index') }}" class="row g-2 align-items-center">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" class="form-control" name="search" placeholder="Search by product name, rack, shelf, or warehouse section..." value="{{ search_query }}">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select class="form-select" name="warehouse" onchange="this.form.submit()">
+                    <option value="">All Warehouses</option>
+                    {% for wh in warehouses %}
+                    <option value="{{ wh }}" {% if warehouse_filter == wh %}selected{% endif %}>{{ wh }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn btn-primary w-100">Find</button>
+                <a href="{{ url_for('locations.index') }}" class="btn btn-outline-secondary" title="Reset"><i class="fa-solid fa-rotate-left"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Warehouse Visual Layout Cards -->
+<div class="row g-3 mb-4">
+    {% for wh_name, sections in warehouse_map.items() %}
+    {% if not warehouse_filter or warehouse_filter == wh_name %}
+    <div class="col-lg-6 col-md-12">
+        <div class="card-modern h-100">
+            <div class="card-header-modern bg-light">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-warehouse text-primary"></i>
+                    <h6 class="mb-0 fw-bold">{{ wh_name }}</h6>
+                </div>
+                <span class="badge bg-primary-subtle text-primary">{{ sections|length }} Active Section(s)</span>
+            </div>
+            <div class="card-body-modern">
+                {% for sec_name, loc_list in sections.items() %}
+                <div class="mb-3 p-3 bg-light rounded border">
+                    <div class="fw-semibold text-dark small mb-2 d-flex align-items-center justify-content-between">
+                        <span><i class="fa-solid fa-layer-group text-secondary me-1"></i>{{ sec_name }}</span>
+                        <span class="text-muted" style="font-size: 0.72rem;">{{ loc_list|length }} Slots</span>
+                    </div>
+                    <div class="row g-2">
+                        {% for loc in loc_list %}
+                        <div class="col-sm-6">
+                            <div class="p-2 bg-white rounded border border-dashed">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold small text-primary">{{ loc.rack }} / {{ loc.shelf }}</span>
+                                    <span class="badge bg-light text-muted border" style="font-size: 0.68rem;">Cap: {{ loc.capacity }}</span>
+                                </div>
+                                <div class="text-muted" style="font-size: 0.72rem;">
+                                    {% if loc.products %}
+                                        <span class="text-success fw-semibold">{{ loc.products|length }} product(s) stocked</span>
+                                    {% else %}
+                                        <span class="text-muted">Empty slot</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+
+<!-- Product Location Locator Table -->
+<div class="card-modern">
+    <div class="card-header-modern">
+        <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-map-location-dot text-primary"></i>
+            <h6 class="mb-0">Product Storage Slot Directory</h6>
+        </div>
+        <span class="badge bg-light text-muted border">{{ products|length }} Matching Items</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table-modern">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Warehouse</th>
+                    <th>Section</th>
+                    <th>Rack / Shelf</th>
+                    <th>Available Quantity</th>
+                    <th>Expiry Date</th>
+                    <th class="text-end">Update Location</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if products %}
+                    {% for p in products %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('inventory.detail', product_id=p.id) }}" class="fw-bold text-decoration-none text-dark">
+                                {{ p.name }}
+                            </a>
+                            <div class="text-muted small font-monospace">{{ p.product_code }}</div>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">{{ p.category.name }}</span>
+                        </td>
+                        <td>
+                            <span class="fw-semibold text-primary"><i class="fa-solid fa-warehouse me-1"></i>{{ p.storage_location.warehouse }}</span>
+                        </td>
+                        <td>
+                            <span class="text-secondary small">{{ p.storage_location.section }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border fw-bold">
+                                {{ p.storage_location.rack }} &bull; {{ p.storage_location.shelf }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="fw-bold {% if p.available_quantity <= p.low_stock_threshold %}text-danger{% else %}text-success{% endif %}">
+                                {{ p.available_quantity }} {{ p.unit }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if p.expiry_date %}
+                                {% set exp = p.expiry_status_info %}
+                                <span class="badge {{ exp.badge }}">{{ exp.status }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">No Expiry</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <button type="button" class="btn btn-outline-primary btn-sm"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#relocateModal"
+                                    data-product-id="{{ p.id }}"
+                                    data-product-name="{{ p.name }}"
+                                    data-current-location-id="{{ p.storage_location_id }}">
+                                <i class="fa-solid fa-arrows-up-down-left-right me-1"></i> Relocate
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">No products found matching the location query.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal: Quick Relocate Product Slot -->
+<div class="modal fade" id="relocateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-warehouse me-2 text-primary"></i>Relocate Product Slot</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('locations.update_product_location') }}">
+                <div class="modal-body">
+                    <p class="mb-3">Select the new warehouse storage slot for <strong id="relocateProductName">this product</strong>.</p>
+                    <input type="hidden" name="product_id" id="relocateProductId" value="">
+                    <div class="mb-3">
+                        <label for="relocateLocationSelect" class="form-label">New Storage Location</label>
+                        <select class="form-select" name="location_id" id="relocateLocationSelect" required>
+                            {% for loc in all_locations %}
+                            <option value="{{ loc.id }}">{{ loc.full_code }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save New Location</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Add New Storage Location Slot -->
+<div class="modal fade" id="addLocationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-plus-circle me-2 text-primary"></i>Add Warehouse Slot</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('locations.add_location') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Warehouse Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="warehouse" placeholder="e.g. Warehouse A or Warehouse C" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Section Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="section" placeholder="e.g. Section 1 - Refrigerated Vault" required>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Rack Number <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="rack" placeholder="e.g. Rack A5" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Shelf Number <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="shelf" placeholder="e.g. Shelf 02" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Capacity (Units)</label>
+                        <input type="number" class="form-control" name="capacity" value="500">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Slot Description</label>
+                        <input type="text" class="form-control" name="description" placeholder="e.g. Special chemical or fragile packaging slot">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Location</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

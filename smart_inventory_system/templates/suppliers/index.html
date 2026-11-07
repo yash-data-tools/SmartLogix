@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Supplier Directory{% endblock %}
+{% block page_title %}Supplier & Vendor Management{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Approved Suppliers & Vendors</h4>
+        <p class="text-muted small mb-0">Manage supplying vendors, corporate contacts, and order fulfillment channels.</p>
+    </div>
+    <div>
+        <a href="{{ url_for('suppliers.add') }}" class="btn btn-primary btn-sm">
+            <i class="fa-solid fa-plus me-1"></i> Register Supplier
+        </a>
+    </div>
+</div>
+
+<!-- Search -->
+<div class="card-modern mb-4">
+    <div class="card-body-modern">
+        <form method="GET" action="{{ url_for('suppliers.index') }}" class="row g-2 align-items-center">
+            <div class="col-md-10">
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" class="form-control" name="search" placeholder="Search by supplier name, company, code, or email..." value="{{ search_query }}">
+                </div>
+            </div>
+            <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn btn-primary w-100">Search</button>
+                <a href="{{ url_for('suppliers.index') }}" class="btn btn-outline-secondary" title="Reset"><i class="fa-solid fa-rotate-left"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Suppliers Directory Grid & Table -->
+<div class="card-modern">
+    <div class="table-responsive">
+        <table class="table-modern">
+            <thead>
+                <tr>
+                    <th>Supplier Code</th>
+                    <th>Contact Person / Representative</th>
+                    <th>Company Name</th>
+                    <th>Phone</th>
+                    <th>Email Address</th>
+                    <th>Active Products</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if suppliers %}
+                    {% for s in suppliers %}
+                    <tr>
+                        <td class="font-monospace fw-bold text-primary">{{ s.supplier_code }}</td>
+                        <td>
+                            <a href="{{ url_for('suppliers.detail', supplier_id=s.id) }}" class="fw-bold text-decoration-none text-dark">
+                                {{ s.name }}
+                            </a>
+                        </td>
+                        <td><span class="fw-semibold">{{ s.company_name }}</span></td>
+                        <td><i class="fa-solid fa-phone me-1 text-muted small"></i>{{ s.phone }}</td>
+                        <td><i class="fa-solid fa-envelope me-1 text-muted small"></i>{{ s.email }}</td>
+                        <td>
+                            <span class="badge bg-primary-subtle text-primary">{{ s.products|length }} products</span>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('suppliers.detail', supplier_id=s.id) }}" class="btn btn-outline-secondary" title="View Profile">
+                                    <i class="fa-regular fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('suppliers.edit', supplier_id=s.id) }}" class="btn btn-outline-primary" title="Edit">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <button type="button" class="btn btn-outline-danger"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#deleteConfirmModal"
+                                        data-action-url="{{ url_for('suppliers.delete', supplier_id=s.id) }}"
+                                        data-item-name="{{ s.company_name }} ({{ s.supplier_code }})">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">No suppliers found matching the query.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}500 - Internal Server Error{% endblock %}
+{% block page_title %}Internal Server Error{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <div class="avatar-circle mx-auto mb-3 bg-danger-subtle text-danger" style="width: 80px; height: 80px; font-size: 2rem;">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+    <h2 class="fw-bold mb-2">500 - System Exception</h2>
+    <p class="text-muted mb-4">An unexpected error occurred while processing the inventory transaction.</p>
+    <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary">
+        <i class="fa-solid fa-house me-1"></i> Return to Dashboard
+    </a>
+</div>
+{% endblock %}

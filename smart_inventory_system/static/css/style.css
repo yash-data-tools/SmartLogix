@@ -1,0 +1,496 @@
+/* ==========================================================================
+   Smart Inventory & Logistics Management System - Commercial Styling
+   ========================================================================== */
+
+:root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #eff6ff;
+    --secondary: #64748b;
+    --dark-sidebar: #0f172a;
+    --dark-sidebar-hover: #1e293b;
+    --dark-sidebar-active: #3b82f6;
+    --bg-main: #f8fafc;
+    --card-bg: #ffffff;
+    --text-primary: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #06b6d4;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   Layout & Sidebar
+   -------------------------------------------------------------------------- */
+.app-wrapper {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+}
+
+#sidebar {
+    width: 260px;
+    min-width: 260px;
+    background-color: var(--dark-sidebar);
+    color: #e2e8f0;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+#sidebar .sidebar-brand {
+    padding: 1.25rem 1.5rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    text-decoration: none;
+}
+
+#sidebar .sidebar-brand i {
+    color: #60a5fa;
+    font-size: 1.35rem;
+}
+
+.sidebar-nav {
+    padding: 1rem 0;
+    list-style: none;
+    margin: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.sidebar-section-title {
+    padding: 0.75rem 1.5rem 0.25rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #64748b;
+}
+
+.sidebar-nav .nav-item {
+    margin: 2px 0.75rem;
+}
+
+.sidebar-nav .nav-link {
+    color: #94a3b8;
+    padding: 0.65rem 1rem;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.sidebar-nav .nav-link i {
+    font-size: 1rem;
+    width: 1.25rem;
+    text-align: center;
+    color: #64748b;
+    transition: color 0.2s ease;
+}
+
+.sidebar-nav .nav-link:hover {
+    color: #ffffff;
+    background-color: var(--dark-sidebar-hover);
+}
+
+.sidebar-nav .nav-link:hover i {
+    color: #60a5fa;
+}
+
+.sidebar-nav .nav-link.active {
+    color: #ffffff;
+    background-color: var(--primary);
+    font-weight: 600;
+}
+
+.sidebar-nav .nav-link.active i {
+    color: #ffffff;
+}
+
+.sidebar-user {
+    padding: 1rem 1.25rem;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Main Content Area */
+#content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* Top Navbar */
+.top-navbar {
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 99;
+}
+
+.top-navbar .page-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.notification-badge {
+    position: relative;
+    color: var(--secondary);
+    font-size: 1.15rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: 50%;
+    transition: background 0.2s;
+    text-decoration: none;
+}
+
+.notification-badge:hover {
+    background-color: var(--primary-light);
+    color: var(--primary);
+}
+
+.notification-badge .badge-counter {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 0.65rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 10px;
+    background-color: var(--danger);
+    color: #fff;
+    font-weight: 700;
+}
+
+.user-profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--text-primary);
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.avatar-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+/* Page Body Container */
+.page-container {
+    padding: 1.75rem 2rem;
+    flex-grow: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Card Components
+   -------------------------------------------------------------------------- */
+.card-modern {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-bottom: 1.5rem;
+}
+
+.card-modern:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.card-header-modern {
+    padding: 1rem 1.25rem;
+    background-color: transparent;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-header-modern h5, 
+.card-header-modern h6 {
+    margin: 0;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.card-body-modern {
+    padding: 1.25rem;
+}
+
+/* Stat Cards */
+.stat-card {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1.15rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+    height: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.stat-icon.primary { background-color: #dbeafe; color: #1d4ed8; }
+.stat-icon.success { background-color: #d1fae5; color: #047857; }
+.stat-icon.warning { background-color: #fef3c7; color: #b45309; }
+.stat-icon.danger  { background-color: #fee2e2; color: #b91c1c; }
+.stat-icon.info    { background-color: #cffafe; color: #0e7490; }
+.stat-icon.purple  { background-color: #ede9fe; color: #6d28d9; }
+
+.stat-info .stat-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.25rem;
+}
+
+.stat-info .stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.stat-info .stat-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   Badges & Indicators
+   -------------------------------------------------------------------------- */
+.badge-expired {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #f87171;
+    padding: 0.35rem 0.6rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+}
+
+.badge-expiring-soon {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fbbf24;
+    padding: 0.35rem 0.6rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+}
+
+.badge-safe {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #34d399;
+    padding: 0.35rem 0.6rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+}
+
+.badge-low-stock {
+    background-color: #ffedd5;
+    color: #9a3412;
+    border: 1px solid #fdba74;
+    padding: 0.35rem 0.6rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   Tables
+   -------------------------------------------------------------------------- */
+.table-modern {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table-modern thead th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    border-top: none;
+    vertical-align: middle;
+}
+
+.table-modern tbody td {
+    padding: 0.85rem 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.86rem;
+    color: var(--text-primary);
+}
+
+.table-modern tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table-modern tbody tr:hover td {
+    background-color: #f1f5f9;
+}
+
+/* --------------------------------------------------------------------------
+   Warehouse Visual Grid & Location Map
+   -------------------------------------------------------------------------- */
+.warehouse-rack-card {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--primary);
+}
+
+.shelf-slot {
+    background-color: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: var(--radius-sm);
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.shelf-slot:hover {
+    background-color: #eff6ff;
+    border-color: var(--primary);
+}
+
+/* --------------------------------------------------------------------------
+   Forms & Buttons
+   -------------------------------------------------------------------------- */
+.form-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.35rem;
+}
+
+.form-control, .form-select {
+    border: 1px solid #cbd5e1;
+    border-radius: var(--radius-sm);
+    padding: 0.55rem 0.85rem;
+    font-size: 0.88rem;
+    color: var(--text-primary);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    font-weight: 500;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+/* --------------------------------------------------------------------------
+   Print Stylesheet
+   -------------------------------------------------------------------------- */
+@media print {
+    #sidebar, .top-navbar, .no-print, .btn, .pagination, .alert {
+        display: none !important;
+    }
+    body, #content, .page-container {
+        background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        color: #000000 !important;
+    }
+    .card-modern {
+        box-shadow: none !important;
+        border: 1px solid #cccccc !important;
+    }
+    .print-header {
+        display: block !important;
+        margin-bottom: 1.5rem;
+    }
+}

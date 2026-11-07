@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Expiry Date Monitoring{% endblock %}
+{% block page_title %}Expiry Date Management & Spoilage Prevention{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Expiry Date Tracking & Audit</h4>
+        <p class="text-muted small mb-0">Color-coded indicators prevent distribution of expired batches and prioritize FIFO clearance.</p>
+    </div>
+    <div>
+        <a href="{{ url_for('expiry.export_csv', status=status_filter) }}" class="btn btn-outline-success btn-sm">
+            <i class="fa-solid fa-file-csv me-1"></i> Export Expiry CSV
+        </a>
+    </div>
+</div>
+
+<!-- Warning Callout -->
+<div class="alert alert-danger bg-danger-subtle border-danger d-flex align-items-center mb-4" role="alert">
+    <i class="fa-solid fa-shield-virus fs-3 text-danger me-3"></i>
+    <div>
+        <strong>System Safety Enforcement:</strong> Products marked as 
+        <span class="badge bg-danger">Expired</span> are automatically blocked from being selected in goods dispatch workflows.
+    </div>
+</div>
+
+<!-- Expiry Status Filter Tabs -->
+<ul class="nav nav-pills mb-4 gap-2">
+    <li class="nav-item">
+        <a class="nav-link {% if status_filter == 'all' %}active{% endif %}" href="{{ url_for('expiry.index', status='all', search=search_query, category_id=category_id) }}">
+            All Perishables <span class="badge bg-light text-dark ms-1">{{ all_count }}</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if status_filter == 'expired' %}active bg-danger{% endif %}" href="{{ url_for('expiry.index', status='expired', search=search_query, category_id=category_id) }}">
+            <i class="fa-solid fa-ban me-1"></i> Expired <span class="badge bg-white text-danger ms-1">{{ expired_count }}</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if status_filter == 'expiring_7d' %}active bg-warning text-dark{% endif %}" href="{{ url_for('expiry.index', status='expiring_7d', search=search_query, category_id=category_id) }}">
+            <i class="fa-solid fa-triangle-exclamation me-1"></i> Expiring in 7 Days <span class="badge bg-dark text-white ms-1">{{ expiring_7d_count }}</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if status_filter == 'expiring_30d' %}active bg-warning text-dark{% endif %}" href="{{ url_for('expiry.index', status='expiring_30d', search=search_query, category_id=category_id) }}">
+            <i class="fa-solid fa-clock-rotate-left me-1"></i> Expiring in 30 Days <span class="badge bg-dark text-white ms-1">{{ expiring_30d_count }}</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if status_filter == 'safe' %}active bg-success{% endif %}" href="{{ url_for('expiry.index', status='safe', search=search_query, category_id=category_id) }}">
+            <i class="fa-solid fa-circle-check me-1"></i> Safe (>30d) <span class="badge bg-white text-success ms-1">{{ safe_count }}</span>
+        </a>
+    </li>
+</ul>
+
+<!-- Expiry Products Table -->
+<div class="card-modern">
+    <div class="table-responsive">
+        <table class="table-modern">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Available Quantity</th>
+                    <th>Storage Location</th>
+                    <th>Supplier</th>
+                    <th>Expiry Date</th>
+                    <th>Status / Timeline</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if products %}
+                    {% for p in products %}
+                    {% set exp = p.expiry_status_info %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('inventory.detail', product_id=p.id) }}" class="fw-bold text-decoration-none text-dark">
+                                {{ p.name }}
+                            </a>
+                            <div class="text-muted small font-monospace">{{ p.product_code }}</div>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">{{ p.category.name }}</span>
+                        </td>
+                        <td>
+                            <span class="fw-bold">{{ p.available_quantity }} {{ p.unit }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-secondary border">
+                                <i class="fa-solid fa-location-dot me-1"></i>{{ p.storage_location.short_code }}
+                            </span>
+                            <div class="text-muted" style="font-size: 0.72rem;">{{ p.storage_location.warehouse }}</div>
+                        </td>
+                        <td>
+                            <span class="small">{{ p.supplier.name }}</span>
+                        </td>
+                        <td class="font-monospace fw-semibold">
+                            {{ p.expiry_date.strftime('%d-%b-%Y') }}
+                        </td>
+                        <td>
+                            <span class="badge {{ exp.badge }} p-2">
+                                <i class="fa-solid {% if exp.code == 'expired' %}fa-ban{% elif 'expiring' in exp.code %}fa-triangle-exclamation{% else %}fa-check{% endif %} me-1"></i>
+                                {{ exp.status }}
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            {% if p.is_expired %}
+                            <button type="button" class="btn btn-outline-danger btn-sm" disabled title="Expired goods cannot be dispatched">
+                                <i class="fa-solid fa-lock me-1"></i> Blocked
+                            </button>
+                            {% else %}
+                            <a href="{{ url_for('dispatch.create', product_id=p.id) }}" class="btn btn-outline-success btn-sm">
+                                <i class="fa-solid fa-paper-plane me-1"></i> Dispatch
+                            </a>
+                            {% endif %}
+                            <a href="{{ url_for('inventory.detail', product_id=p.id) }}" class="btn btn-light border btn-sm">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            <i class="fa-solid fa-shield-heart fa-3x text-success mb-2 d-block"></i>
+                            No products found in the current expiry filter.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

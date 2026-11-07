@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}System Notifications{% endblock %}
+{% block page_title %}Notification Center & Alerts{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Operational Alerts & Notifications</h4>
+        <p class="text-muted small mb-0">Automated system warnings regarding low stock, expiration dates, and transport logistics.</p>
+    </div>
+    <div class="d-flex gap-2">
+        {% if unread_count > 0 %}
+        <form method="POST" action="{{ url_for('notifications.mark_all_read') }}">
+            <button type="submit" class="btn btn-outline-primary btn-sm">
+                <i class="fa-solid fa-check-double me-1"></i> Mark All as Read
+            </button>
+        </form>
+        {% endif %}
+        {% if notifications %}
+        <form method="POST" action="{{ url_for('notifications.clear_all') }}">
+            <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Clear all notifications?')">
+                <i class="fa-solid fa-trash me-1"></i> Clear All
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card-modern">
+    <div class="card-header-modern bg-light">
+        <h6 class="mb-0 fw-bold">Recent Alerts ({{ unread_count }} Unread)</h6>
+    </div>
+    <div class="card-body-modern p-0">
+        {% if notifications %}
+            <div class="list-group list-group-flush">
+                {% for n in notifications %}
+                <div class="list-group-item list-group-item-action p-3 {% if not n.is_read %}bg-light-subtle fw-semibold border-start border-4 border-{{ n.type }}{% endif %}">
+                    <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-{{ n.type }} p-1 rounded-circle" style="width: 10px; height: 10px;"></span>
+                            <h6 class="mb-0 fw-bold">{{ n.title }}</h6>
+                        </div>
+                        <small class="text-muted">{{ n.created_at.strftime('%d-%b-%Y %H:%M') }}</small>
+                    </div>
+                    <p class="mb-2 text-secondary small fw-normal">{{ n.message }}</p>
+                    <div class="d-flex gap-2">
+                        {% if n.link %}
+                        <a href="{{ url_for('notifications.mark_read', notification_id=n.id) }}" class="btn btn-primary btn-sm py-0 px-2 small">
+                            <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> View Item
+                        </a>
+                        {% endif %}
+                        {% if not n.is_read %}
+                        <a href="{{ url_for('notifications.mark_read', notification_id=n.id) }}" class="btn btn-outline-secondary btn-sm py-0 px-2 small">
+                            Mark Read
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5 text-muted">
+                <i class="fa-solid fa-bell-slash fa-3x text-secondary mb-3 d-block"></i>
+                <h6>No notifications</h6>
+                <p class="small mb-0">All systems are running smoothly with no active inventory alerts.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

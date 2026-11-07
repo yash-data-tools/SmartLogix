@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Register Transporter{% endblock %}
+{% block page_title %}Register Logistics Transporter{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h4 class="fw-bold mb-1">Add Logistics Carrier</h4>
+                <p class="text-muted small mb-0">Record transporter commercial details, vehicle license, and driver contact.</p>
+            </div>
+            <a href="{{ url_for('transporters.index') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back to Fleet
+            </a>
+        </div>
+
+        <div class="card-modern">
+            <div class="card-body-modern p-4">
+                <form method="POST" action="{{ url_for('transporters.add') }}">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Transporter / Company Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="e.g. FastFreight Logistics Co." required autofocus>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="contact_number" class="form-label">Dispatch Phone <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="contact_number" name="contact_number" placeholder="+1 (555) 000-0000" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="dispatch@transporter.com">
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="vehicle_number" class="form-label">Vehicle Registration Number <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="vehicle_number" name="vehicle_number" placeholder="e.g. DL-01-AB-1234 or US-TRK-9021" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="vehicle_type" class="form-label">Vehicle Category / Type</label>
+                            <select class="form-select" id="vehicle_type" name="vehicle_type">
+                                <option value="Heavy 18-Wheeler Truck">Heavy 18-Wheeler Truck</option>
+                                <option value="Medium Cargo Truck">Medium Cargo Truck</option>
+                                <option value="Refrigerated Container Van">Refrigerated Container Van (Cold Chain)</option>
+                                <option value="High-Roof Sprinter Van">High-Roof Sprinter Van</option>
+                                <option value="Flatbed Heavy Carrier">Flatbed Heavy Carrier</option>
+                                <option value="City Delivery Mini-Truck">City Delivery Mini-Truck</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="driver_name" class="form-label">Primary Driver Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="driver_name" name="driver_name" placeholder="e.g. Marcus Higgins" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="driver_contact" class="form-label">Driver Direct Mobile <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="driver_contact" name="driver_contact" placeholder="+1 (555) 000-0001" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Current Availability Status</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="Available">Available for Dispatch</option>
+                            <option value="On Trip">Currently On Trip</option>
+                            <option value="Inactive">Maintenance / Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="address" class="form-label">Depot / Operating Yard Address</label>
+                        <textarea class="form-control" id="address" name="address" rows="2" placeholder="Depot location, garage gate, highway bypass..."></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{{ url_for('transporters.index') }}" class="btn btn-light border px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                            <i class="fa-solid fa-check me-1"></i> Register Transporter
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

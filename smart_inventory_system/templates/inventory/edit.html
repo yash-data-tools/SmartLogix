@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Product - {{ product.name }}{% endblock %}
+{% block page_title %}Edit Product Details{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-9">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h4 class="fw-bold mb-1">Edit Product: {{ product.name }}</h4>
+                <p class="text-muted small mb-0 font-monospace">Product Code: {{ product.product_code }}</p>
+            </div>
+            <a href="{{ url_for('inventory.detail', product_id=product.id) }}" class="btn btn-outline-secondary btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back to Details
+            </a>
+        </div>
+
+        <div class="card-modern">
+            <div class="card-body-modern p-4">
+                <form method="POST" action="{{ url_for('inventory.edit', product_id=product.id) }}">
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-8">
+                            <label for="name" class="form-label">Product Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ product.name }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="category_id" class="form-label">Category <span class="text-danger">*</span></label>
+                            <select class="form-select" id="category_id" name="category_id" required>
+                                {% for cat in categories %}
+                                <option value="{{ cat.id }}" {% if product.category_id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label for="description" class="form-label">Description / Specifications</label>
+                            <textarea class="form-control" id="description" name="description" rows="2">{{ product.description or '' }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="supplier_id" class="form-label">Primary Supplier <span class="text-danger">*</span></label>
+                            <select class="form-select" id="supplier_id" name="supplier_id" required>
+                                {% for s in suppliers %}
+                                <option value="{{ s.id }}" {% if product.supplier_id == s.id %}selected{% endif %}>{{ s.name }} ({{ s.company_name }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="storage_location_id" class="form-label">Storage Location <span class="text-danger">*</span></label>
+                            <select class="form-select" id="storage_location_id" name="storage_location_id" required>
+                                {% for loc in locations %}
+                                <option value="{{ loc.id }}" {% if product.storage_location_id == loc.id %}selected{% endif %}>{{ loc.full_code }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label for="unit" class="form-label">Unit of Measure</label>
+                            <input type="text" class="form-control" id="unit" name="unit" value="{{ product.unit }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="purchase_price" class="form-label">Purchase Price ($)</label>
+                            <input type="number" step="0.01" class="form-control" id="purchase_price" name="purchase_price" value="{{ product.purchase_price }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="low_stock_threshold" class="form-label">Low Stock Threshold</label>
+                            <input type="number" class="form-control" id="low_stock_threshold" name="low_stock_threshold" value="{{ product.low_stock_threshold }}" min="1">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="expiry_date" class="form-label">Expiry Date <span class="text-muted small">(Leave empty for non-perishable)</span></label>
+                            <input type="date" class="form-control" id="expiry_date" name="expiry_date" value="{{ product.expiry_date.strftime('%Y-%m-%d') if product.expiry_date else '' }}">
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end">
+                            <div class="p-2 bg-light border rounded w-100 small text-muted">
+                                Note: To adjust physical stock counts, use the 
+                                <a href="{{ url_for('incoming.add', product_id=product.id) }}" class="fw-semibold">Incoming Restock Intake</a> or 
+                                <a href="{{ url_for('dispatch.create', product_id=product.id) }}" class="fw-semibold">Goods Dispatch</a>.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-2">
+                        <a href="{{ url_for('inventory.detail', product_id=product.id) }}" class="btn btn-light border px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                            <i class="fa-solid fa-floppy-disk me-1"></i> Update Product
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

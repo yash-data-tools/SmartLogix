@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Monthly Incoming Goods Records{% endblock %}
+{% block page_title %}Monthly Incoming Goods Management{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Monthly Incoming Goods Log</h4>
+        <p class="text-muted small mb-0">Audit and track arrival of inventory shipments organized by month and fiscal period.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('incoming.export_csv', year=selected_year, month=selected_month, supplier_id=selected_supplier_id) }}" class="btn btn-outline-success btn-sm">
+            <i class="fa-solid fa-file-csv me-1"></i> Export CSV Report
+        </a>
+        <a href="{{ url_for('incoming.add') }}" class="btn btn-primary btn-sm">
+            <i class="fa-solid fa-plus me-1"></i> Receive New Goods
+        </a>
+    </div>
+</div>
+
+<!-- Monthly Summary KPIs -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon info">
+                <i class="fa-solid fa-receipt"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-label">Total Shipments Logged</div>
+                <div class="stat-value">{{ total_records }}</div>
+                <div class="stat-desc">Filtered period records</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="fa-solid fa-dolly"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-label">Total Units Inwarded</div>
+                <div class="stat-value">{{ "{:,}".format(total_qty) }}</div>
+                <div class="stat-desc">Stock added to inventory</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon primary">
+                <i class="fa-solid fa-money-bill-wave"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-label">Total Procurement Value</div>
+                <div class="stat-value">${{ "{:,.2f}".format(total_value) }}</div>
+                <div class="stat-desc">Calculated invoice volume</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters Toolbar -->
+<div class="card-modern mb-4">
+    <div class="card-body-modern">
+        <form method="GET" action="{{ url_for('incoming.index') }}" class="row g-2 align-items-center">
+            <!-- Search -->
+            <div class="col-lg-3 col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" class="form-control" name="search" placeholder="Search product, code, or invoice..." value="{{ search_query }}">
+                </div>
+            </div>
+
+            <!-- Month Filter -->
+            <div class="col-lg-2 col-md-3">
+                <select class="form-select" name="month" onchange="this.form.submit()">
+                    <option value="">All Months</option>
+                    {% for m_num, m_name in month_names %}
+                    <option value="{{ m_num }}" {% if selected_month == m_num %}selected{% endif %}>{{ m_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Year Filter -->
+            <div class="col-lg-2 col-md-3">
+                <select class="form-select" name="year" onchange="this.form.submit()">
+                    <option value="">All Years</option>
+                    {% for y in years %}
+                    <option value="{{ y }}" {% if selected_year == y %}selected{% endif %}>{{ y }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Supplier Filter -->
+            <div class="col-lg-3 col-md-6">
+                <select class="form-select" name="supplier_id" onchange="this.form.submit()">
+                    <option value="">All Suppliers</option>
+                    {% for s in suppliers %}
+                    <option value="{{ s.id }}" {% if selected_supplier_id == s.id %}selected{% endif %}>{{ s.company_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="col-lg-2 col-md-6 d-flex gap-1">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+                <a href="{{ url_for('incoming.index') }}" class="btn btn-outline-secondary" title="Reset"><i class="fa-solid fa-rotate-left"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Incoming Records Table -->
+<div class="card-modern">
+    <div class="table-responsive">
+        <table class="table-modern">
+            <thead>
+                <tr>
+                    <th>Intake Code</th>
+                    <th>Invoice #</th>
+                    <th>Arrival Date</th>
+                    <th>Period</th>
+                    <th>Product Received</th>
+                    <th>Supplier</th>
+                    <th>Quantity</th>
+                    <th>Unit Cost</th>
+                    <th>Total Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if records %}
+                    {% for r in records %}
+                    <tr>
+                        <td class="font-monospace fw-bold text-primary">{{ r.incoming_code }}</td>
+                        <td class="font-monospace small">{{ r.invoice_number }}</td>
+                        <td class="text-muted small">{{ r.date_of_arrival.strftime('%d-%b-%Y') }}</td>
+                        <td>
+                            <span class="badge bg-light text-secondary border">
+                                {{ r.date_of_arrival.strftime('%b %Y') }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('inventory.detail', product_id=r.product.id) }}" class="fw-semibold text-decoration-none text-dark">
+                                {{ r.product.name }}
+                            </a>
+                            <div class="text-muted small font-monospace">{{ r.product.product_code }}</div>
+                        </td>
+                        <td>
+                            <span class="small">{{ r.supplier.name }}</span>
+                        </td>
+                        <td>
+                            <span class="fw-bold text-success">+{{ r.quantity_received }} {{ r.product.unit }}</span>
+                        </td>
+                        <td>${{ "%.2f"|format(r.purchase_price) }}</td>
+                        <td class="fw-bold">${{ "{:,.2f}".format(r.quantity_received * r.purchase_price) }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-4">
+                            <i class="fa-solid fa-file-invoice fa-3x text-secondary mb-2 d-block"></i>
+                            No incoming goods records found matching the filter criteria.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if pagination.pages > 1 %}
+    <div class="card-footer bg-white border-top py-3 d-flex justify-content-between align-items-center">
+        <span class="small text-muted">Showing page {{ pagination.page }} of {{ pagination.pages }}</span>
+        <ul class="pagination pagination-sm mb-0">
+            <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('incoming.index', page=pagination.prev_num, search=search_query, month=selected_month, year=selected_year, supplier_id=selected_supplier_id) }}">&laquo; Prev</a>
+            </li>
+            {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if p %}
+                    <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('incoming.index', page=p, search=search_query, month=selected_month, year=selected_year, supplier_id=selected_supplier_id) }}">{{ p }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+            {% endfor %}
+            <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('incoming.index', page=pagination.next_num, search=search_query, month=selected_month, year=selected_year, supplier_id=selected_supplier_id) }}">Next &raquo;</a>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

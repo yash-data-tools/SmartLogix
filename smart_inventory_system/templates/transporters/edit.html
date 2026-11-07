@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Transporter - {{ transporter.name }}{% endblock %}
+{% block page_title %}Edit Carrier Details{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h4 class="fw-bold mb-1">Edit: {{ transporter.name }}</h4>
+                <p class="text-muted small mb-0 font-monospace">{{ transporter.transporter_code }} &bull; {{ transporter.vehicle_number }}</p>
+            </div>
+            <a href="{{ url_for('transporters.detail', transporter_id=transporter.id) }}" class="btn btn-outline-secondary btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back to Profile
+            </a>
+        </div>
+
+        <div class="card-modern">
+            <div class="card-body-modern p-4">
+                <form method="POST" action="{{ url_for('transporters.edit', transporter_id=transporter.id) }}">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Carrier Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ transporter.name }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="contact_number" class="form-label">Dispatch Phone <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="contact_number" name="contact_number" value="{{ transporter.contact_number }}" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ transporter.email }}">
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="vehicle_number" class="form-label">Vehicle Number <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="vehicle_number" name="vehicle_number" value="{{ transporter.vehicle_number }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="vehicle_type" class="form-label">Vehicle Type</label>
+                            <input type="text" class="form-control" id="vehicle_type" name="vehicle_type" value="{{ transporter.vehicle_type }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="driver_name" class="form-label">Driver Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="driver_name" name="driver_name" value="{{ transporter.driver_name }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="driver_contact" class="form-label">Driver Phone <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="driver_contact" name="driver_contact" value="{{ transporter.driver_contact }}" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="Available" {% if transporter.status == 'Available' %}selected{% endif %}>Available</option>
+                            <option value="On Trip" {% if transporter.status == 'On Trip' %}selected{% endif %}>On Trip</option>
+                            <option value="Inactive" {% if transporter.status == 'Inactive' %}selected{% endif %}>Inactive / Maintenance</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="address" class="form-label">Depot Address</label>
+                        <textarea class="form-control" id="address" name="address" rows="2">{{ transporter.address }}</textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{{ url_for('transporters.detail', transporter_id=transporter.id) }}" class="btn btn-light border px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                            <i class="fa-solid fa-floppy-disk me-1"></i> Update Carrier
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

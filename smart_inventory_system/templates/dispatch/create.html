@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Create Goods Dispatch Order{% endblock %}
+{% block page_title %}New Goods Transportation & Dispatch Order{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-9">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h4 class="fw-bold mb-1">Create Outbound Dispatch Order</h4>
+                <p class="text-muted small mb-0">Select inventory stock, assign logistics carrier, and enter consignee address.</p>
+            </div>
+            <a href="{{ url_for('dispatch.index') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back to Dispatches
+            </a>
+        </div>
+
+        <div class="card-modern">
+            <div class="card-body-modern p-4">
+                <form method="POST" action="{{ url_for('dispatch.create') }}" id="dispatchForm">
+                    <!-- Product Selection -->
+                    <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-box me-2"></i>1. Stock & Product Selection</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-8">
+                            <label for="product_select" class="form-label">Product to Dispatch <span class="text-danger">*</span></label>
+                            <select class="form-select" id="product_select" name="product_id" required onchange="handleProductSelect()">
+                                <option value="" disabled {% if not preselected_product_id %}selected{% endif %}>Choose product from inventory...</option>
+                                {% for p in products %}
+                                <option value="{{ p.id }}" 
+                                        data-available="{{ p.available_quantity }}"
+                                        data-unit="{{ p.unit }}"
+                                        data-expired="{{ 'true' if p.is_expired else 'false' }}"
+                                        data-expiry-date="{{ p.expiry_date.strftime('%d-%b-%Y') if p.expiry_date else 'Non-Perishable' }}"
+                                        data-location="{{ p.storage_location.full_code }}"
+                                        {% if preselected_product_id == p.id %}selected{% endif %}>
+                                    {{ p.name }} [{{ p.product_code }}] &bull; Stock: {{ p.available_quantity }} {{ p.unit }}
+                                    {% if p.is_expired %}(EXPIRED - BLOCKED){% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="quantity_dispatched" class="form-label">Quantity to Dispatch <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="quantity_dispatched" name="quantity_dispatched" min="1" placeholder="e.g. 50" required>
+                                <span class="input-group-text bg-light" id="unit_display">Units</span>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Live Stock Status Box -->
+                        <div class="col-12" id="stockAlertBox" style="display: none;">
+                            <div class="alert p-3 mb-0" id="stockAlertContent">
+                                <!-- Populated dynamically by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4 text-muted">
+
+                    <!-- Logistics & Carrier Assignment -->
+                    <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-truck-fast me-2"></i>2. Transportation & Fleet Carrier</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="transporter_select" class="form-label">Assign Transporter Carrier</label>
+                            <select class="form-select" id="transporter_select" name="transporter_id" onchange="handleTransporterSelect()">
+                                <option value="">Self Pickup / Unassigned Third-Party</option>
+                                {% for tr in transporters %}
+                                <option value="{{ tr.id }}"
+                                        data-vehicle="{{ tr.vehicle_number }}"
+                                        data-driver="{{ tr.driver_name }}"
+                                        data-driver-phone="{{ tr.driver_contact }}">
+                                    {{ tr.name }} &bull; {{ tr.vehicle_type }} ({{ tr.vehicle_number }}) - [{{ tr.status }}]
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="vehicle_number" class="form-label">Vehicle License Number</label>
+                            <input type="text" class="form-control font-monospace" id="vehicle_number" name="vehicle_number" placeholder="e.g. US-TRK-9021">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="driver_contact" class="form-label">Driver Contact / Mobile</label>
+                            <input type="text" class="form-control" id="driver_contact" name="driver_contact" placeholder="e.g. Marcus (+1 555...)">
+                        </div>
+                    </div>
+
+                    <hr class="my-4 text-muted">
+
+                    <!-- Consignee / Delivery Address & Dates -->
+                    <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-location-dot me-2"></i>3. Consignee & Destination Details</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="receiver_name" class="form-label">Consignee / Receiver Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="receiver_name" name="receiver_name" placeholder="e.g. St. Jude Central Clinic (Dr. Ronald)" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="receiver_phone" class="form-label">Receiver Contact Phone <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="receiver_phone" name="receiver_phone" placeholder="+1 (555) 000-0000" required>
+                        </div>
+                        <div class="col-12">
+                            <label for="destination_address" class="form-label">Destination Delivery Address <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="destination_address" name="destination_address" rows="2" placeholder="Complete address, warehouse bay number, city, postal code..." required></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="expected_delivery_date" class="form-label">Expected Delivery Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="expected_delivery_date" name="expected_delivery_date" value="{{ today }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="delivery_status" class="form-label">Initial Order Status</label>
+                            <select class="form-select" id="delivery_status" name="delivery_status">
+                                <option value="Pending">Pending (Staged for Loading)</option>
+                                <option value="Ready for Dispatch">Ready for Dispatch</option>
+                                <option value="In Transit">In Transit (Vehicle Departed)</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label for="notes" class="form-label">Special Handling Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="2" placeholder="Fragile goods, temperature specifications, delivery gate gatepass instructions..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-2">
+                        <a href="{{ url_for('dispatch.index') }}" class="btn btn-light border px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold" id="submitDispatchBtn">
+                            <i class="fa-solid fa-paper-plane me-1"></i> Issue Dispatch & Deduct Stock
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function handleProductSelect() {
+    const select = document.getElementById('product_select');
+    const selectedOption = select.options[select.selectedIndex];
+    const alertBox = document.getElementById('stockAlertBox');
+    const alertContent = document.getElementById('stockAlertContent');
+    const unitDisplay = document.getElementById('unit_display');
+    const submitBtn = document.getElementById('submitDispatchBtn');
+    const qtyInput = document.getElementById('quantity_dispatched');
+
+    if (!selectedOption || !selectedOption.value) {
+        alertBox.style.display = 'none';
+        return;
+    }
+
+    const available = parseInt(selectedOption.getAttribute('data-available') || '0');
+    const unit = selectedOption.getAttribute('data-unit') || 'Units';
+    const isExpired = selectedOption.getAttribute('data-expired') === 'true';
+    const expiryDate = selectedOption.getAttribute('data-expiry-date');
+    const location = selectedOption.getAttribute('data-location');
+
+    unitDisplay.textContent = unit;
+    qtyInput.max = available;
+
+    alertBox.style.display = 'block';
+
+    if (isExpired) {
+        alertContent.className = 'alert alert-danger mb-0';
+        alertContent.innerHTML = `<i class="fa-solid fa-ban me-2 fs-5"></i> <strong>DISPATCH PREVENTED:</strong> This product expired on ${expiryDate}. Under health & safety regulations, expired stock cannot be dispatched.`;
+        submitBtn.disabled = true;
+    } else if (available <= 0) {
+        alertContent.className = 'alert alert-danger mb-0';
+        alertContent.innerHTML = `<i class="fa-solid fa-triangle-exclamation me-2 fs-5"></i> <strong>OUT OF STOCK:</strong> Available quantity is 0 ${unit}. Stock intake is required before dispatching.`;
+        submitBtn.disabled = true;
+    } else {
+        alertContent.className = 'alert alert-success-subtle text-dark border-success mb-0';
+        alertContent.innerHTML = `<i class="fa-solid fa-check-circle text-success me-2 fs-5"></i> <strong>Stock Available:</strong> <strong>${available} ${unit}</strong> located at <em>${location}</em>. Expiry: <strong>${expiryDate}</strong>.`;
+        submitBtn.disabled = false;
+    }
+}
+
+function handleTransporterSelect() {
+    const select = document.getElementById('transporter_select');
+    const selectedOption = select.options[select.selectedIndex];
+    const vehicleInput = document.getElementById('vehicle_number');
+    const driverInput = document.getElementById('driver_contact');
+
+    if (selectedOption && selectedOption.value) {
+        const vehicle = selectedOption.getAttribute('data-vehicle');
+        const driver = selectedOption.getAttribute('data-driver');
+        const phone = selectedOption.getAttribute('data-driver-phone');
+        
+        vehicleInput.value = vehicle || '';
+        driverInput.value = driver ? `${driver} (${phone})` : '';
+    }
+}
+
+// Trigger check on page load if preselected
+document.addEventListener('DOMContentLoaded', function() {
+    handleProductSelect();
+    handleTransporterSelect();
+});
+</script>
+{% endblock %}

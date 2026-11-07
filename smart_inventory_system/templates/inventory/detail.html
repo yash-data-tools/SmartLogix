@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - Details{% endblock %}
+{% block page_title %}Product Overview: {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <h4 class="fw-bold mb-0">{{ product.name }}</h4>
+            <span class="badge bg-light text-muted border font-monospace">{{ product.product_code }}</span>
+        </div>
+        <p class="text-muted small mb-0">{{ product.category.name }} &bull; Supplier: {{ product.supplier.name }}</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{{ url_for('incoming.add', product_id=product.id) }}" class="btn btn-outline-primary btn-sm">
+            <i class="fa-solid fa-plus me-1"></i> Receive / Restock
+        </a>
+        {% if not product.is_expired and product.available_quantity > 0 %}
+        <a href="{{ url_for('dispatch.create', product_id=product.id) }}" class="btn btn-outline-success btn-sm">
+            <i class="fa-solid fa-paper-plane me-1"></i> Dispatch Stock
+        </a>
+        {% endif %}
+        <a href="{{ url_for('inventory.edit', product_id=product.id) }}" class="btn btn-outline-secondary btn-sm">
+            <i class="fa-solid fa-pen me-1"></i> Edit
+        </a>
+        <button type="button" class="btn btn-outline-danger btn-sm"
+                data-bs-toggle="modal" 
+                data-bs-target="#deleteConfirmModal"
+                data-action-url="{{ url_for('inventory.delete', product_id=product.id) }}"
+                data-item-name="{{ product.name }} ({{ product.product_code }})">
+            <i class="fa-solid fa-trash me-1"></i> Delete
+        </button>
+    </div>
+</div>
+
+<!-- Product Summary Cards -->
+<div class="row g-3 mb-4">
+    <!-- Available Stock -->
+    <div class="col-md-3 col-sm-6">
+        <div class="card-modern p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-semibold text-uppercase">Available Stock</span>
+                <i class="fa-solid fa-cubes text-primary fs-5"></i>
+            </div>
+            <div class="fs-2 fw-bold {% if product.available_quantity <= product.low_stock_threshold %}text-danger{% else %}text-success{% endif %}">
+                {{ product.available_quantity }} <span class="fs-6 fw-normal text-muted">{{ product.unit }}</span>
+            </div>
+            <div class="mt-2">
+                {% if product.is_low_stock %}
+                <span class="badge bg-danger text-white"><i class="fa-solid fa-triangle-exclamation me-1"></i> Below threshold ({{ product.low_stock_threshold }})</span>
+                {% else %}
+                <span class="badge bg-success-subtle text-success"><i class="fa-solid fa-circle-check me-1"></i> Optimal Stock</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Storage Location -->
+    <div class="col-md-3 col-sm-6">
+        <div class="card-modern p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-semibold text-uppercase">Storage Location</span>
+                <i class="fa-solid fa-warehouse text-info fs-5"></i>
+            </div>
+            <div class="fs-5 fw-bold text-dark mb-1">
+                {{ product.storage_location.warehouse }}
+            </div>
+            <div class="small text-muted">{{ product.storage_location.section }}</div>
+            <div class="small text-muted fw-semibold">Rack: {{ product.storage_location.rack }} &bull; Shelf: {{ product.storage_location.shelf }}</div>
+            <div class="mt-2">
+                <button type="button" class="btn btn-outline-info btn-sm py-0 px-2 small" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#relocateModal"
+                        data-product-id="{{ product.id }}"
+                        data-product-name="{{ product.name }}"
+                        data-current-location-id="{{ product.storage_location_id }}">
+                    <i class="fa-solid fa-arrows-up-down-left-right me-1"></i> Relocate Slot
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expiry Tracking -->
+    <div class="col-md-3 col-sm-6">
+        <div class="card-modern p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-semibold text-uppercase">Expiry Status</span>
+                <i class="fa-solid fa-calendar-xmark text-warning fs-5"></i>
+            </div>
+            {% if product.expiry_date %}
+                {% set exp = product.expiry_status_info %}
+                <div class="mb-1">
+                    <span class="badge {{ exp.badge }} fs-6">{{ exp.status }}</span>
+                </div>
+                <div class="text-muted small">Expiry Date: {{ product.expiry_date.strftime('%d-%b-%Y') }}</div>
+                {% if product.is_expired %}
+                <div class="small text-danger fw-semibold mt-1"><i class="fa-solid fa-ban me-1"></i> Dispatch orders disabled</div>
+                {% endif %}
+            {% else %}
+                <div class="fs-5 fw-bold text-success mb-1">Non-Perishable</div>
+                <div class="text-muted small">No expiration date set</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Financial / Valuation -->
+    <div class="col-md-3 col-sm-6">
+        <div class="card-modern p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-semibold text-uppercase">Valuation</span>
+                <i class="fa-solid fa-receipt text-secondary fs-5"></i>
+            </div>
+            <div class="fs-3 fw-bold text-dark mb-1">
+                ${{ "%.2f"|format(product.available_quantity * product.purchase_price) }}
+            </div>
+            <div class="text-muted small">Unit Price: ${{ "%.2f"|format(product.purchase_price) }} / {{ product.unit }}</div>
+            <div class="text-muted small">Total Dispatched: {{ product.dispatched_quantity }} {{ product.unit }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Stock Transaction History Ledger -->
+<div class="card-modern mb-4">
+    <div class="card-header-modern">
+        <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-clock-rotate-left text-primary"></i>
+            <h6 class="mb-0">Stock Transaction Ledger & Movement Audit</h6>
+        </div>
+        <span class="badge bg-light text-muted border">Automatic Stock In/Out Log</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table-modern">
+            <thead>
+                <tr>
+                    <th>Date & Time</th>
+                    <th>Transaction Type</th>
+                    <th>Reference / Document #</th>
+                    <th>Change (Units)</th>
+                    <th>Stock Balance After</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if transactions %}
+                    {% for t in transactions %}
+                    <tr>
+                        <td class="text-muted small">{{ t.created_at.strftime('%d-%b-%Y %H:%M') }}</td>
+                        <td>
+                            {% if 'Incoming' in t.transaction_type %}
+                            <span class="badge bg-success-subtle text-success"><i class="fa-solid fa-arrow-down me-1"></i>{{ t.transaction_type }}</span>
+                            {% elif 'Dispatched' in t.transaction_type %}
+                            <span class="badge bg-primary-subtle text-primary"><i class="fa-solid fa-arrow-up me-1"></i>{{ t.transaction_type }}</span>
+                            {% elif 'Restored' in t.transaction_type %}
+                            <span class="badge bg-warning-subtle text-warning"><i class="fa-solid fa-rotate-left me-1"></i>{{ t.transaction_type }}</span>
+                            {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary">{{ t.transaction_type }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="font-monospace small">{{ t.reference_id or '—' }}</td>
+                        <td class="fw-bold {% if t.quantity > 0 %}text-success{% else %}text-danger{% endif %}">
+                            {% if t.quantity > 0 %}+{{ t.quantity }}{% else %}{{ t.quantity }}{% endif %} {{ product.unit }}
+                        </td>
+                        <td class="fw-bold">{{ t.balance_after }} {{ product.unit }}</td>
+                        <td class="text-muted small">{{ t.notes or '' }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-3">No recorded stock transactions yet.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal: Quick Relocate Slot -->
+<div class="modal fade" id="relocateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-warehouse me-2 text-primary"></i>Relocate Product Slot</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('locations.update_product_location') }}">
+                <div class="modal-body">
+                    <p class="mb-3">Choose the new warehouse rack and shelf assignment for <strong id="relocateProductName">{{ product.name }}</strong>.</p>
+                    <input type="hidden" name="product_id" id="relocateProductId" value="{{ product.id }}">
+                    <div class="mb-3">
+                        <label for="relocateLocationSelect" class="form-label">Available Storage Location</label>
+                        <select class="form-select" name="location_id" id="relocateLocationSelect" required>
+                            {% for loc in locations %}
+                            <option value="{{ loc.id }}" {% if product.storage_location_id == loc.id %}selected{% endif %}>
+                                {{ loc.full_code }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Storage Slot</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Add Product{% endblock %}
+{% block page_title %}Register New Product{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-9">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h4 class="fw-bold mb-1">New Product Intake</h4>
+                <p class="text-muted small mb-0">Fill in product specifications, batch numbers, storage slot, and threshold.</p>
+            </div>
+            <a href="{{ url_for('inventory.index') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back to Catalog
+            </a>
+        </div>
+
+        <div class="card-modern">
+            <div class="card-body-modern p-4">
+                <form method="POST" action="{{ url_for('inventory.add') }}">
+                    <!-- Section 1: Basic Info -->
+                    <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-circle-info me-2"></i>Product Identification</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-8">
+                            <label for="name" class="form-label">Product Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="e.g. Paracetamol Tablets 500mg" required autofocus>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="category_id" class="form-label">Category <span class="text-danger">*</span></label>
+                            <select class="form-select" id="category_id" name="category_id" required>
+                                <option value="" disabled selected>Select Category...</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat.id }}">{{ cat.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label for="description" class="form-label">Description / Specifications</label>
+                            <textarea class="form-control" id="description" name="description" rows="2" placeholder="Material composition, grade, packaging size, handling instructions..."></textarea>
+                        </div>
+                    </div>
+
+                    <hr class="my-4 text-muted">
+
+                    <!-- Section 2: Storage & Supplier -->
+                    <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-warehouse me-2"></i>Storage Slot & Supplier Assignment</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="supplier_id" class="form-label">Primary Supplier <span class="text-danger">*</span></label>
+                            <select class="form-select" id="supplier_id" name="supplier_id" required>
+                                <option value="" disabled selected>Select Supplier...</option>
+                                {% for s in suppliers %}
+                                <option value="{{ s.id }}">{{ s.name }} ({{ s.company_name }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="storage_location_id" class="form-label">Warehouse Storage Slot <span class="text-danger">*</span></label>
+                            <select class="form-select" id="storage_location_id" name="storage_location_id" required>
+                                <option value="" disabled selected>Select Rack & Shelf...</option>
+                                {% for loc in locations %}
+                                <option value="{{ loc.id }}">{{ loc.full_code }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr class="my-4 text-muted">
+
+                    <!-- Section 3: Stock Quantity & Units -->
+                    <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-cubes me-2"></i>Stock Intake & Inventory Controls</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3 col-sm-6">
+                            <label for="initial_quantity" class="form-label">Initial Quantity Received</label>
+                            <input type="number" class="form-control" id="initial_quantity" name="initial_quantity" value="0" min="0">
+                            <small class="text-muted">Recorded into available stock</small>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <label for="unit" class="form-label">Unit of Measure</label>
+                            <select class="form-select" id="unit" name="unit">
+                                <option value="Pieces">Pieces</option>
+                                <option value="Boxes">Boxes</option>
+                                <option value="Cartons">Cartons</option>
+                                <option value="Bottles">Bottles</option>
+                                <option value="Packs">Packs</option>
+                                <option value="Bags">Bags</option>
+                                <option value="Drums">Drums</option>
+                                <option value="Kg">Kilograms (Kg)</option>
+                                <option value="Litres">Litres</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <label for="purchase_price" class="form-label">Purchase Price ($)</label>
+                            <input type="number" step="0.01" class="form-control" id="purchase_price" name="purchase_price" value="0.00" min="0">
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <label for="low_stock_threshold" class="form-label">Low Stock Threshold</label>
+                            <input type="number" class="form-control" id="low_stock_threshold" name="low_stock_threshold" value="15" min="1">
+                            <small class="text-muted">Triggers warning below this</small>
+                        </div>
+                    </div>
+
+                    <hr class="my-4 text-muted">
+
+                    <!-- Section 4: Dates & Expiry -->
+                    <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-calendar-days me-2"></i>Dates & Expiry Tracking</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="arrival_date" class="form-label">Date of Arrival</label>
+                            <input type="date" class="form-control" id="arrival_date" name="arrival_date" value="{{ today }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="expiry_date" class="form-label">Expiry Date <span class="text-muted small">(Leave empty if non-perishable)</span></label>
+                            <input type="date" class="form-control" id="expiry_date" name="expiry_date">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-2">
+                        <a href="{{ url_for('inventory.index') }}" class="btn btn-light border px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                            <i class="fa-solid fa-check me-1"></i> Save & Register Product
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

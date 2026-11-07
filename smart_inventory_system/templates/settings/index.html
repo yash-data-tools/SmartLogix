@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}System Settings{% endblock %}
+{% block page_title %}Application Settings & Demo Utilities{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9 col-xl-8">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h4 class="fw-bold mb-1">System Configuration & Database Management</h4>
+                <p class="text-muted small mb-0">Project credentials, system information, and sample data restoration.</p>
+            </div>
+        </div>
+
+        <!-- System Architecture Card -->
+        <div class="card-modern mb-4">
+            <div class="card-header-modern bg-light">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-server text-primary"></i>
+                    <h6 class="mb-0 fw-bold">Platform Information</h6>
+                </div>
+            </div>
+            <div class="card-body-modern">
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label class="text-muted small fw-semibold text-uppercase">Application Name</label>
+                        <div class="fw-bold text-dark">Smart Inventory & Logistics Management System</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted small fw-semibold text-uppercase">Backend Stack</label>
+                        <div class="fw-semibold">Python 3 &bull; Flask &bull; Flask-SQLAlchemy</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted small fw-semibold text-uppercase">Database Engine</label>
+                        <div class="fw-semibold">SQLite (instance/inventory.db)</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted small fw-semibold text-uppercase">Frontend & Charts</label>
+                        <div class="fw-semibold">Bootstrap 5.3 &bull; Chart.js 4.4 &bull; Font Awesome 6</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demo Accounts Card -->
+        <div class="card-modern mb-4">
+            <div class="card-header-modern bg-light">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-users text-primary"></i>
+                    <h6 class="mb-0 fw-bold">Pre-Configured Demo Accounts</h6>
+                </div>
+            </div>
+            <div class="card-body-modern">
+                <div class="table-responsive">
+                    <table class="table-modern">
+                        <thead>
+                            <tr>
+                                <th>Role</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Password</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge bg-primary">Lead Administrator</span></td>
+                                <td class="font-monospace fw-bold">admin</td>
+                                <td>admin@smartinventory.com</td>
+                                <td class="font-monospace text-muted">admin123</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-secondary">Warehouse Manager</span></td>
+                                <td class="font-monospace fw-bold">manager_sara</td>
+                                <td>sara.vance@smartinventory.com</td>
+                                <td class="font-monospace text-muted">manager123</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sample Data Reset / Seeder Utility -->
+        <div class="card-modern border-warning">
+            <div class="card-header-modern bg-warning-subtle text-dark">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-arrows-rotate text-warning"></i>
+                    <h6 class="mb-0 fw-bold">Reset Demo Sample Data</h6>
+                </div>
+            </div>
+            <div class="card-body-modern">
+                <p class="small text-muted mb-3">
+                    If you altered stock numbers, cancelled deliveries, or tested edge cases and want to restore the database to its initial clean state with 18+ products, sample suppliers, transporters, incoming shipments, and historical charts, click below.
+                </p>
+                <form method="POST" action="{{ url_for('settings.reset_sample_data') }}" onsubmit="return confirm('Are you sure you want to re-seed the sample database? All current test edits will be reset to defaults.')">
+                    <button type="submit" class="btn btn-warning text-dark fw-semibold">
+                        <i class="fa-solid fa-rotate-left me-1"></i> Re-Seed Complete Sample Data
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
