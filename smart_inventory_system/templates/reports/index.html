@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Reports & Analytics{% endblock %}
-{% block page_title %}Reports & Business Intelligence{% endblock %}
+{% block title %}Reports{% endblock %}
+{% block page_title %}Reports{% endblock %}
 
 {% block content %}
 <!-- Print Header (Visible only when printed) -->
@@ -20,15 +20,14 @@
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 no-print">
     <div>
-        <h4 class="fw-bold mb-1">Operational Reports & Analytics</h4>
-        <p class="text-muted small mb-0">Generate stock summaries, logistics carrier audits, supplier breakdowns, and downloadable CSV exports.</p>
+        <h4 class="fw-bold mb-0">Reports & Analytics</h4>
     </div>
     <div class="d-flex gap-2">
         <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">
-            <i class="fa-solid fa-print me-1"></i> Print Report
+            <i class="fa-solid fa-print me-1"></i> Print
         </button>
         <a href="{{ url_for('reports.export_csv', type=report_type, start_date=start_date, end_date=end_date) }}" class="btn btn-outline-success btn-sm">
-            <i class="fa-solid fa-file-csv me-1"></i> Export to CSV
+            <i class="fa-solid fa-file-csv me-1"></i> Export CSV
         </a>
     </div>
 </div>
@@ -37,37 +36,37 @@
 <ul class="nav nav-tabs mb-4 no-print">
     <li class="nav-item">
         <a class="nav-link {% if report_type == 'stock' %}active fw-bold{% endif %}" href="{{ url_for('reports.index', type='stock', start_date=start_date, end_date=end_date) }}">
-            <i class="fa-solid fa-cubes me-1"></i> Current Stock
+            <i class="fa-solid fa-cubes me-1"></i> Stock
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link {% if report_type == 'incoming' %}active fw-bold{% endif %}" href="{{ url_for('reports.index', type='incoming', start_date=start_date, end_date=end_date) }}">
-            <i class="fa-solid fa-truck-ramp-box me-1"></i> Incoming Goods
+            <i class="fa-solid fa-truck-ramp-box me-1"></i> Receiving
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link {% if report_type == 'outgoing' %}active fw-bold{% endif %}" href="{{ url_for('reports.index', type='outgoing', start_date=start_date, end_date=end_date) }}">
-            <i class="fa-solid fa-truck-fast me-1"></i> Outgoing Dispatches
+            <i class="fa-solid fa-truck-fast me-1"></i> Dispatch
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link {% if report_type == 'low_stock' %}active fw-bold text-warning{% endif %}" href="{{ url_for('reports.index', type='low_stock', start_date=start_date, end_date=end_date) }}">
-            <i class="fa-solid fa-triangle-exclamation me-1"></i> Low-Stock
+            <i class="fa-solid fa-triangle-exclamation me-1"></i> Low Stock
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link {% if report_type == 'expired' %}active fw-bold text-danger{% endif %}" href="{{ url_for('reports.index', type='expired', start_date=start_date, end_date=end_date) }}">
-            <i class="fa-solid fa-ban me-1"></i> Expired Goods
+            <i class="fa-solid fa-ban me-1"></i> Expired
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link {% if report_type == 'suppliers' %}active fw-bold{% endif %}" href="{{ url_for('reports.index', type='suppliers', start_date=start_date, end_date=end_date) }}">
-            <i class="fa-solid fa-handshake me-1"></i> Supplier Performance
+            <i class="fa-solid fa-handshake me-1"></i> Suppliers
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link {% if report_type == 'transporters' %}active fw-bold{% endif %}" href="{{ url_for('reports.index', type='transporters', start_date=start_date, end_date=end_date) }}">
-            <i class="fa-solid fa-route me-1"></i> Transporter Deliveries
+            <i class="fa-solid fa-route me-1"></i> Transporters
         </a>
     </li>
 </ul>

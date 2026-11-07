@@ -1,27 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}Expiry Date Monitoring{% endblock %}
-{% block page_title %}Expiry Date Management & Spoilage Prevention{% endblock %}
+{% block title %}Perishables{% endblock %}
+{% block page_title %}Perishables{% endblock %}
 
 {% block content %}
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
     <div>
-        <h4 class="fw-bold mb-1">Expiry Date Tracking & Audit</h4>
-        <p class="text-muted small mb-0">Color-coded indicators prevent distribution of expired batches and prioritize FIFO clearance.</p>
+        <h4 class="fw-bold mb-0">Perishables & Expiry</h4>
     </div>
     <div>
         <a href="{{ url_for('expiry.export_csv', status=status_filter) }}" class="btn btn-outline-success btn-sm">
-            <i class="fa-solid fa-file-csv me-1"></i> Export Expiry CSV
+            <i class="fa-solid fa-file-csv me-1"></i> Export CSV
         </a>
-    </div>
-</div>
-
-<!-- Warning Callout -->
-<div class="alert alert-danger bg-danger-subtle border-danger d-flex align-items-center mb-4" role="alert">
-    <i class="fa-solid fa-shield-virus fs-3 text-danger me-3"></i>
-    <div>
-        <strong>System Safety Enforcement:</strong> Products marked as 
-        <span class="badge bg-danger">Expired</span> are automatically blocked from being selected in goods dispatch workflows.
     </div>
 </div>
 
@@ -29,7 +19,7 @@
 <ul class="nav nav-pills mb-4 gap-2">
     <li class="nav-item">
         <a class="nav-link {% if status_filter == 'all' %}active{% endif %}" href="{{ url_for('expiry.index', status='all', search=search_query, category_id=category_id) }}">
-            All Perishables <span class="badge bg-light text-dark ms-1">{{ all_count }}</span>
+            All <span class="badge bg-light text-dark ms-1">{{ all_count }}</span>
         </a>
     </li>
     <li class="nav-item">
@@ -39,12 +29,12 @@
     </li>
     <li class="nav-item">
         <a class="nav-link {% if status_filter == 'expiring_7d' %}active bg-warning text-dark{% endif %}" href="{{ url_for('expiry.index', status='expiring_7d', search=search_query, category_id=category_id) }}">
-            <i class="fa-solid fa-triangle-exclamation me-1"></i> Expiring in 7 Days <span class="badge bg-dark text-white ms-1">{{ expiring_7d_count }}</span>
+            <i class="fa-solid fa-triangle-exclamation me-1"></i> < 7 Days <span class="badge bg-dark text-white ms-1">{{ expiring_7d_count }}</span>
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link {% if status_filter == 'expiring_30d' %}active bg-warning text-dark{% endif %}" href="{{ url_for('expiry.index', status='expiring_30d', search=search_query, category_id=category_id) }}">
-            <i class="fa-solid fa-clock-rotate-left me-1"></i> Expiring in 30 Days <span class="badge bg-dark text-white ms-1">{{ expiring_30d_count }}</span>
+            <i class="fa-solid fa-clock-rotate-left me-1"></i> < 30 Days <span class="badge bg-dark text-white ms-1">{{ expiring_30d_count }}</span>
         </a>
     </li>
     <li class="nav-item">

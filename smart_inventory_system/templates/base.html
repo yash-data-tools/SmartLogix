@@ -47,7 +47,7 @@
         </div>
 
         <ul class="sidebar-nav">
-            <li class="sidebar-section-title">Core Operations</li>
+            <li class="sidebar-section-title">Operations</li>
             <li class="nav-item">
                 <a class="nav-link {% if request.blueprint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard.index') }}">
                     <i class="fa-solid fa-gauge-high"></i>
@@ -57,33 +57,33 @@
             <li class="nav-item">
                 <a class="nav-link {% if request.blueprint == 'inventory' %}active{% endif %}" href="{{ url_for('inventory.index') }}">
                     <i class="fa-solid fa-box"></i>
-                    <span>Products & Stock</span>
+                    <span>Inventory</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if request.blueprint == 'incoming' %}active{% endif %}" href="{{ url_for('incoming.index') }}">
                     <i class="fa-solid fa-truck-ramp-box"></i>
-                    <span>Incoming Goods</span>
+                    <span>Receiving</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if request.blueprint == 'locations' %}active{% endif %}" href="{{ url_for('locations.index') }}">
                     <i class="fa-solid fa-warehouse"></i>
-                    <span>Storage Locations</span>
+                    <span>Locations</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if request.blueprint == 'expiry' %}active{% endif %}" href="{{ url_for('expiry.index') }}">
                     <i class="fa-solid fa-calendar-xmark"></i>
-                    <span>Expiry Tracking</span>
+                    <span>Perishables</span>
                 </a>
             </li>
 
-            <li class="sidebar-section-title">Logistics & Partners</li>
+            <li class="sidebar-section-title">Logistics</li>
             <li class="nav-item">
                 <a class="nav-link {% if request.blueprint == 'dispatch' %}active{% endif %}" href="{{ url_for('dispatch.index') }}">
                     <i class="fa-solid fa-truck-fast"></i>
-                    <span>Goods Dispatch</span>
+                    <span>Dispatch</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -99,23 +99,23 @@
                 </a>
             </li>
 
-            <li class="sidebar-section-title">Intelligence & Tools</li>
+            <li class="sidebar-section-title">System</li>
             <li class="nav-item">
                 <a class="nav-link {% if request.blueprint == 'reports' %}active{% endif %}" href="{{ url_for('reports.index') }}">
                     <i class="fa-solid fa-chart-line"></i>
-                    <span>Reports & Analytics</span>
+                    <span>Reports</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if request.blueprint == 'notifications' %}active{% endif %}" href="{{ url_for('notifications.index') }}">
                     <i class="fa-solid fa-bell"></i>
-                    <span>System Alerts</span>
+                    <span>Event Logs</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if request.blueprint == 'settings' %}active{% endif %}" href="{{ url_for('settings.index') }}">
                     <i class="fa-solid fa-gear"></i>
-                    <span>System Settings</span>
+                    <span>Settings</span>
                 </a>
             </li>
         </ul>
@@ -220,8 +220,8 @@
 
         <!-- Footer -->
         <footer class="app-footer no-print">
-            <span>&copy; {{ now.year }} SmartLogix - Inventory & Logistics Management System.</span>
-            <span><i class="fa-solid fa-shield-halved text-primary me-1"></i> Secured Role-Based System</span>
+            <span>&copy; {{ now.year }} SmartLogix</span>
+            <span><i class="fa-solid fa-circle-check text-success me-1"></i>Operational</span>
         </footer>
     </div>
 </div>

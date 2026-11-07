@@ -38,8 +38,8 @@ class SystemTestSuite(unittest.TestCase):
         self.login_admin()
         res = self.client.get('/dashboard')
         self.assertEqual(res.status_code, 200)
-        self.assertIn(b'Operational Summary', res.data)
-        self.assertIn(b'Total Products', res.data)
+        self.assertIn(b'Overview', res.data)
+        self.assertIn(b'Products', res.data)
 
         # Dynamic charts JSON endpoint
         api_res = self.client.get('/api/dashboard-charts')
@@ -60,7 +60,7 @@ class SystemTestSuite(unittest.TestCase):
         # 1. List catalog
         res = self.client.get('/inventory/')
         self.assertEqual(res.status_code, 200)
-        self.assertIn(b'Product Inventory Catalog', res.data)
+        self.assertIn(b'Inventory Catalog', res.data)
 
         # 2. Add product
         cat = Category.query.first()
@@ -209,7 +209,7 @@ class SystemTestSuite(unittest.TestCase):
         self.login_admin()
         res = self.client.get('/locations/')
         self.assertEqual(res.status_code, 200)
-        self.assertIn(b'Goods Location & Warehouse Slot Architecture', res.data)
+        self.assertIn(b'Storage Locations', res.data)
         print("  [PASS] Storage location visual grid loaded successfully")
 
 if __name__ == '__main__':

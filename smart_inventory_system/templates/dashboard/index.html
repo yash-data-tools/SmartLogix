@@ -1,163 +1,145 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard Overview{% endblock %}
-{% block page_title %}Dashboard & Operations Command Center{% endblock %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
 <!-- Quick Action Bar -->
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-    <div>
-        <h4 class="fw-bold mb-1">Operational Summary</h4>
-        <p class="text-muted small mb-0">Real-time inventory levels, pending shipments, and warehouse status.</p>
-    </div>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <h4 class="fw-bold mb-0">Overview</h4>
     <div class="d-flex flex-wrap gap-2">
         <a href="{{ url_for('inventory.add') }}" class="btn btn-primary btn-sm">
             <i class="fa-solid fa-plus me-1"></i> Add Product
         </a>
         <a href="{{ url_for('incoming.add') }}" class="btn btn-outline-primary btn-sm">
-            <i class="fa-solid fa-truck-ramp-box me-1"></i> Receive Goods
+            <i class="fa-solid fa-truck-ramp-box me-1"></i> Receive
         </a>
         <a href="{{ url_for('dispatch.create') }}" class="btn btn-outline-success btn-sm">
-            <i class="fa-solid fa-paper-plane me-1"></i> New Dispatch
+            <i class="fa-solid fa-paper-plane me-1"></i> Dispatch
         </a>
         <a href="{{ url_for('reports.index') }}" class="btn btn-light border btn-sm">
-            <i class="fa-solid fa-file-export me-1"></i> Analytics
+            <i class="fa-solid fa-file-export me-1"></i> Reports
         </a>
     </div>
 </div>
 
-<!-- 9 Primary Metrics Cards -->
+<!-- 9 Primary Metrics Cards (Clean, Clickable, No Text Clutter) -->
 <div class="row g-3 mb-4">
     <!-- 1. Total Products -->
     <div class="col-xl-4 col-md-6 col-sm-12">
-        <div class="stat-card">
+        <a href="{{ url_for('inventory.index') }}" class="stat-card text-decoration-none">
             <div class="stat-icon primary">
                 <i class="fa-solid fa-boxes-stacked"></i>
             </div>
             <div class="stat-info">
-                <div class="stat-label">Total Products</div>
+                <div class="stat-label">Products</div>
                 <div class="stat-value">{{ total_products }}</div>
-                <div class="stat-desc"><a href="{{ url_for('inventory.index') }}" class="text-decoration-none text-primary">View catalog &rarr;</a></div>
             </div>
-        </div>
+        </a>
     </div>
 
     <!-- 2. Total Stock Quantity -->
     <div class="col-xl-4 col-md-6 col-sm-12">
-        <div class="stat-card">
+        <a href="{{ url_for('inventory.index') }}" class="stat-card text-decoration-none">
             <div class="stat-icon success">
                 <i class="fa-solid fa-cubes"></i>
             </div>
             <div class="stat-info">
-                <div class="stat-label">Total Stock Quantity</div>
+                <div class="stat-label">Total Stock Units</div>
                 <div class="stat-value">{{ "{:,}".format(total_stock_qty) }}</div>
-                <div class="stat-desc text-muted">Across all storage racks</div>
             </div>
-        </div>
+        </a>
     </div>
 
     <!-- 3. Total Incoming Goods -->
     <div class="col-xl-4 col-md-6 col-sm-12">
-        <div class="stat-card">
+        <a href="{{ url_for('incoming.index') }}" class="stat-card text-decoration-none">
             <div class="stat-icon info">
                 <i class="fa-solid fa-truck-ramp-box"></i>
             </div>
             <div class="stat-info">
-                <div class="stat-label">Total Incoming Goods</div>
+                <div class="stat-label">Incoming Received</div>
                 <div class="stat-value">{{ "{:,}".format(total_incoming_qty) }}</div>
-                <div class="stat-desc"><a href="{{ url_for('incoming.index') }}" class="text-decoration-none text-info">View monthly logs &rarr;</a></div>
             </div>
-        </div>
+        </a>
     </div>
 
     <!-- 4. Total Dispatched Goods -->
     <div class="col-xl-4 col-md-6 col-sm-12">
-        <div class="stat-card">
+        <a href="{{ url_for('dispatch.index') }}" class="stat-card text-decoration-none">
             <div class="stat-icon purple">
                 <i class="fa-solid fa-dolly"></i>
             </div>
             <div class="stat-info">
-                <div class="stat-label">Total Dispatched Goods</div>
+                <div class="stat-label">Total Dispatched</div>
                 <div class="stat-value">{{ "{:,}".format(total_dispatched_qty) }}</div>
-                <div class="stat-desc"><a href="{{ url_for('dispatch.index') }}" class="text-decoration-none text-primary">Track deliveries &rarr;</a></div>
             </div>
-        </div>
+        </a>
     </div>
 
     <!-- 5. Low Stock Products -->
     <div class="col-xl-4 col-md-6 col-sm-12">
-        <div class="stat-card">
+        <a href="{{ url_for('inventory.index', stock='low') }}" class="stat-card text-decoration-none">
             <div class="stat-icon warning">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
             <div class="stat-info">
-                <div class="stat-label">Low Stock Products</div>
+                <div class="stat-label">Low Stock Queue</div>
                 <div class="stat-value text-warning">{{ low_stock_count }}</div>
-                <div class="stat-desc">
-                    <a href="{{ url_for('inventory.index', stock='low') }}" class="text-decoration-none text-warning fw-semibold">Reorder required &rarr;</a>
-                </div>
             </div>
-        </div>
+        </a>
     </div>
 
     <!-- 6. Expiring Soon Products -->
     <div class="col-xl-4 col-md-6 col-sm-12">
-        <div class="stat-card">
+        <a href="{{ url_for('expiry.index', status='expiring_30d') }}" class="stat-card text-decoration-none">
             <div class="stat-icon warning">
                 <i class="fa-solid fa-clock-rotate-left"></i>
             </div>
             <div class="stat-info">
                 <div class="stat-label">Expiring Soon (30d)</div>
-                <div class="stat-value text-orange" style="color: #ea580c;">{{ expiring_soon_count }}</div>
-                <div class="stat-desc">
-                    <a href="{{ url_for('expiry.index', status='expiring_30d') }}" class="text-decoration-none text-secondary">Review timeline &rarr;</a>
-                </div>
+                <div class="stat-value text-warning">{{ expiring_soon_count }}</div>
             </div>
-        </div>
+        </a>
     </div>
 
     <!-- 7. Expired Products -->
     <div class="col-xl-4 col-md-6 col-sm-12">
-        <div class="stat-card">
+        <a href="{{ url_for('expiry.index', status='expired') }}" class="stat-card text-decoration-none">
             <div class="stat-icon danger">
                 <i class="fa-solid fa-ban"></i>
             </div>
             <div class="stat-info">
-                <div class="stat-label">Expired Products</div>
+                <div class="stat-label">Expired Stock</div>
                 <div class="stat-value text-danger">{{ expired_count }}</div>
-                <div class="stat-desc">
-                    <a href="{{ url_for('expiry.index', status='expired') }}" class="text-decoration-none text-danger fw-semibold">Dispatch blocked &rarr;</a>
-                </div>
             </div>
-        </div>
+        </a>
     </div>
 
     <!-- 8. Total Transporters -->
     <div class="col-xl-4 col-md-6 col-sm-12">
-        <div class="stat-card">
+        <a href="{{ url_for('transporters.index') }}" class="stat-card text-decoration-none">
             <div class="stat-icon primary">
                 <i class="fa-solid fa-truck"></i>
             </div>
             <div class="stat-info">
-                <div class="stat-label">Registered Transporters</div>
+                <div class="stat-label">Transporters</div>
                 <div class="stat-value">{{ total_transporters }}</div>
-                <div class="stat-desc"><a href="{{ url_for('transporters.index') }}" class="text-decoration-none text-primary">Fleet directory &rarr;</a></div>
             </div>
-        </div>
+        </a>
     </div>
 
     <!-- 9. Active Deliveries -->
     <div class="col-xl-4 col-md-6 col-sm-12">
-        <div class="stat-card">
+        <a href="{{ url_for('dispatch.index', status='In Transit') }}" class="stat-card text-decoration-none">
             <div class="stat-icon info">
                 <i class="fa-solid fa-route"></i>
             </div>
             <div class="stat-info">
                 <div class="stat-label">Active Deliveries</div>
                 <div class="stat-value text-info">{{ active_deliveries }}</div>
-                <div class="stat-desc">Pending & In Transit</div>
             </div>
-        </div>
+        </a>
     </div>
 </div>
 
@@ -169,9 +151,8 @@
             <div class="card-header-modern">
                 <div class="d-flex align-items-center gap-2">
                     <i class="fa-solid fa-chart-column text-primary"></i>
-                    <h6 class="mb-0">Monthly Goods Received vs Dispatched (Trend)</h6>
+                    <h6 class="mb-0">Monthly Goods Movement</h6>
                 </div>
-                <span class="badge bg-light text-muted border">Real-time DB Data</span>
             </div>
             <div class="card-body-modern" style="position: relative; height: 320px;">
                 <canvas id="monthlyTrendsChart"></canvas>
