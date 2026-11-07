@@ -112,9 +112,9 @@
                 <i class="fa-solid fa-receipt text-secondary fs-5"></i>
             </div>
             <div class="fs-3 fw-bold text-dark mb-1">
-                ${{ "%.2f"|format(product.available_quantity * product.purchase_price) }}
+                ₹{{ "%.2f"|format(product.available_quantity * product.purchase_price) }}
             </div>
-            <div class="text-muted small">Unit Price: ${{ "%.2f"|format(product.purchase_price) }} / {{ product.unit }}</div>
+            <div class="text-muted small">Unit Price: ₹{{ "%.2f"|format(product.purchase_price) }} / {{ product.unit }}</div>
             <div class="text-muted small">Total Dispatched: {{ product.dispatched_quantity }} {{ product.unit }}</div>
         </div>
     </div>

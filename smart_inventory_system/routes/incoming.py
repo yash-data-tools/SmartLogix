@@ -180,7 +180,7 @@ def export_csv():
 
     headers = [
         'Incoming Code', 'Invoice Number', 'Date of Arrival', 'Month', 'Year',
-        'Product Code', 'Product Name', 'Supplier Name', 'Quantity Received', 'Unit', 'Unit Price ($)', 'Total Value ($)', 'Notes'
+        'Product Code', 'Product Name', 'Supplier Name', 'Quantity Received', 'Unit', 'Unit Price (₹)', 'Total Value (₹)', 'Notes'
     ]
 
     rows = []

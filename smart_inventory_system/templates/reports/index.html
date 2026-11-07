@@ -138,8 +138,8 @@
                     <td><span class="badge bg-light text-dark border">{{ p.category.name }}</span></td>
                     <td>{{ p.storage_location.short_code }}</td>
                     <td class="fw-bold">{{ p.available_quantity }} {{ p.unit }}</td>
-                    <td>${{ "%.2f"|format(p.purchase_price) }}</td>
-                    <td class="fw-bold text-dark">${{ "{:,.2f}".format(p.available_quantity * p.purchase_price) }}</td>
+                    <td>₹{{ "%.2f"|format(p.purchase_price) }}</td>
+                    <td class="fw-bold text-dark">₹{{ "{:,.2f}".format(p.available_quantity * p.purchase_price) }}</td>
                     <td>
                         {% if p.is_low_stock %}
                         <span class="badge bg-danger">Low Stock</span>
@@ -155,7 +155,7 @@
                     <td colspan="4">Summary Totals</td>
                     <td>{{ summary.total_stock }} Units</td>
                     <td>—</td>
-                    <td>${{ "{:,.2f}".format(summary.total_value) }}</td>
+                    <td>₹{{ "{:,.2f}".format(summary.total_value) }}</td>
                     <td>{{ summary.low_stock_count }} Low Stock</td>
                 </tr>
             </tfoot>
@@ -187,8 +187,8 @@
                     <td class="fw-semibold">{{ inc.product.name }}</td>
                     <td>{{ inc.supplier.name }}</td>
                     <td class="fw-bold text-success">+{{ inc.quantity_received }} {{ inc.product.unit }}</td>
-                    <td>${{ "%.2f"|format(inc.purchase_price) }}</td>
-                    <td class="fw-bold">${{ "{:,.2f}".format(inc.quantity_received * inc.purchase_price) }}</td>
+                    <td>₹{{ "%.2f"|format(inc.purchase_price) }}</td>
+                    <td class="fw-bold">₹{{ "{:,.2f}".format(inc.quantity_received * inc.purchase_price) }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -197,7 +197,7 @@
                     <td colspan="5">Period Totals</td>
                     <td class="text-success">+{{ summary.total_qty }} Units</td>
                     <td>—</td>
-                    <td>${{ "{:,.2f}".format(summary.total_spend) }}</td>
+                    <td>₹{{ "{:,.2f}".format(summary.total_spend) }}</td>
                 </tr>
             </tfoot>
         </table>
@@ -335,7 +335,7 @@
                     <td>{{ s.supplier.phone }} / {{ s.supplier.email }}</td>
                     <td><span class="badge bg-light text-dark border">{{ s.active_products }} items</span></td>
                     <td class="fw-bold text-success">{{ s.total_qty }} units</td>
-                    <td class="fw-bold text-dark">${{ "{:,.2f}".format(s.total_spent) }}</td>
+                    <td class="fw-bold text-dark">₹{{ "{:,.2f}".format(s.total_spent) }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

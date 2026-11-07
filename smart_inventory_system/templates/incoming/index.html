@@ -49,7 +49,7 @@
             </div>
             <div class="stat-info">
                 <div class="stat-label">Procurement Value</div>
-                <div class="stat-value">${{ "{:,.2f}".format(total_value) }}</div>
+                <div class="stat-value">₹{{ "{:,.2f}".format(total_value) }}</div>
             </div>
         </div>
     </div>
@@ -147,8 +147,8 @@
                         <td>
                             <span class="fw-bold text-success">+{{ r.quantity_received }} {{ r.product.unit }}</span>
                         </td>
-                        <td>${{ "%.2f"|format(r.purchase_price) }}</td>
-                        <td class="fw-bold">${{ "{:,.2f}".format(r.quantity_received * r.purchase_price) }}</td>
+                        <td>₹{{ "%.2f"|format(r.purchase_price) }}</td>
+                        <td class="fw-bold">₹{{ "{:,.2f}".format(r.quantity_received * r.purchase_price) }}</td>
                     </tr>
                     {% endfor %}
                 {% else %}

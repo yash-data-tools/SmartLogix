@@ -132,7 +132,7 @@ def export_csv():
 
     if report_type == 'stock':
         products = Product.query.order_by(Product.name.asc()).all()
-        headers = ['Product Code', 'Product Name', 'Category', 'Available Stock', 'Unit', 'Price ($)', 'Total Value ($)', 'Storage Location', 'Low Stock Alert']
+        headers = ['Product Code', 'Product Name', 'Category', 'Available Stock', 'Unit', 'Price (₹)', 'Total Value (₹)', 'Storage Location', 'Low Stock Alert']
         rows = [[
             p.product_code, p.name, p.category.name, p.available_quantity, p.unit,
             f"{p.purchase_price:.2f}", f"{(p.available_quantity * p.purchase_price):.2f}",
@@ -155,7 +155,7 @@ def export_csv():
 
     elif report_type == 'suppliers':
         suppliers = Supplier.query.all()
-        headers = ['Supplier Code', 'Company Name', 'Contact Person', 'Phone', 'Email', 'Active Products', 'Total Units Supplied', 'Total Invoiced ($)']
+        headers = ['Supplier Code', 'Company Name', 'Contact Person', 'Phone', 'Email', 'Active Products', 'Total Units Supplied', 'Total Invoiced (₹)']
         rows = []
         for s in suppliers:
             total_qty = db.session.query(func.coalesce(func.sum(IncomingGood.quantity_received), 0)).filter(IncomingGood.supplier_id == s.id).scalar()

@@ -40,7 +40,7 @@
     <div class="col-md-4">
         <div class="card-modern p-3 h-100">
             <div class="text-muted small fw-semibold text-uppercase mb-2">Procurement Volumes</div>
-            <div class="fs-4 fw-bold text-dark">${{ "{:,.2f}".format(total_spend) }}</div>
+            <div class="fs-4 fw-bold text-dark">₹{{ "{:,.2f}".format(total_spend) }}</div>
             <div class="text-muted small">{{ total_units_received }} total units supplied across {{ incoming_records|length }} shipments</div>
         </div>
     </div>
@@ -74,7 +74,7 @@
                         <td class="font-monospace small text-muted">{{ p.product_code }}</td>
                         <td><span class="badge bg-light text-dark border">{{ p.category.name }}</span></td>
                         <td class="fw-bold">{{ p.available_quantity }} {{ p.unit }}</td>
-                        <td>${{ "%.2f"|format(p.purchase_price) }}</td>
+                        <td>₹{{ "%.2f"|format(p.purchase_price) }}</td>
                         <td><span class="badge bg-light text-secondary border">{{ p.storage_location.short_code }}</span></td>
                     </tr>
                     {% endfor %}
@@ -116,8 +116,8 @@
                         <td class="font-monospace small">{{ rec.invoice_number }}</td>
                         <td>{{ rec.product.name }}</td>
                         <td class="fw-bold text-success">+{{ rec.quantity_received }} {{ rec.product.unit }}</td>
-                        <td>${{ "%.2f"|format(rec.purchase_price) }}</td>
-                        <td class="fw-bold">${{ "{:,.2f}".format(rec.quantity_received * rec.purchase_price) }}</td>
+                        <td>₹{{ "%.2f"|format(rec.purchase_price) }}</td>
+                        <td class="fw-bold">₹{{ "{:,.2f}".format(rec.quantity_received * rec.purchase_price) }}</td>
                     </tr>
                     {% endfor %}
                 {% else %}
