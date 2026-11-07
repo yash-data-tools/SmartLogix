@@ -18,13 +18,86 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }, 5500);
 
-    // 3. Mobile Sidebar Toggle
+    // 3. Theme Toggle (Light / Dark Mode)
+    const themeToggleBtn = document.getElementById('themeToggle');
+    function updateThemeIcon(theme) {
+        if (!themeToggleBtn) return;
+        const icon = themeToggleBtn.querySelector('i');
+        if (!icon) return;
+        if (theme === 'dark') {
+            icon.className = 'fa-solid fa-sun';
+            themeToggleBtn.setAttribute('title', 'Switch to Light Mode');
+            themeToggleBtn.style.color = '#fbbf24';
+        } else {
+            icon.className = 'fa-solid fa-moon';
+            themeToggleBtn.setAttribute('title', 'Switch to Dark Mode');
+            themeToggleBtn.style.color = '';
+        }
+    }
+
+    const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+    updateThemeIcon(currentTheme);
+
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', function () {
+            const activeTheme = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light';
+            const newTheme = activeTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-bs-theme', newTheme);
+            document.documentElement.setAttribute('data-theme', newTheme);
+            try {
+                localStorage.setItem('smartlogix-theme', newTheme);
+            } catch (e) {}
+            updateThemeIcon(newTheme);
+            window.dispatchEvent(new CustomEvent('smartlogix-theme-changed', { detail: { theme: newTheme } }));
+        });
+    }
+
+    // 4. Responsive Mobile Sidebar Drawer Toggle & Overlay
     const sidebarToggleBtn = document.getElementById('sidebarToggle');
+    const sidebarCloseBtn = document.getElementById('sidebarClose');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
     const sidebar = document.getElementById('sidebar');
-    if (sidebarToggleBtn && sidebar) {
-        sidebarToggleBtn.addEventListener('click', function () {
-            sidebar.classList.toggle('d-none');
-            sidebar.classList.toggle('d-flex');
+
+    function openMobileSidebar() {
+        if (sidebar) sidebar.classList.add('show');
+        if (sidebarBackdrop) sidebarBackdrop.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeMobileSidebar() {
+        if (sidebar) sidebar.classList.remove('show');
+        if (sidebarBackdrop) sidebarBackdrop.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    if (sidebarToggleBtn) {
+        sidebarToggleBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (sidebar && sidebar.classList.contains('show')) {
+                closeMobileSidebar();
+            } else {
+                openMobileSidebar();
+            }
+        });
+    }
+
+    if (sidebarCloseBtn) {
+        sidebarCloseBtn.addEventListener('click', closeMobileSidebar);
+    }
+
+    if (sidebarBackdrop) {
+        sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+    }
+
+    // Auto-close mobile drawer when navigation links are clicked
+    if (sidebar) {
+        const navLinks = sidebar.querySelectorAll('.nav-link');
+        navLinks.forEach(function (link) {
+            link.addEventListener('click', function () {
+                if (window.innerWidth < 992) {
+                    closeMobileSidebar();
+                }
+            });
         });
     }
 

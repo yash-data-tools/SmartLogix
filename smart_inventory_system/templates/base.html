@@ -14,17 +14,37 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Custom Application CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Instant Dark Mode Init Script (Prevents White Flashing) -->
+    <script>
+        (function() {
+            try {
+                const storedTheme = localStorage.getItem('smartlogix-theme');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const theme = storedTheme || (prefersDark ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-bs-theme', theme);
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {}
+        })();
+    </script>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
 
 <div class="app-wrapper">
+    <!-- Backdrop for Mobile Sidebar Drawer -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
     <!-- Sidebar Navigation -->
     <nav id="sidebar">
-        <a href="{{ url_for('dashboard.index') }}" class="sidebar-brand">
-            <i class="fa-solid fa-boxes-stacked"></i>
-            <span>SmartLogix</span>
-        </a>
+        <div class="sidebar-brand">
+            <a href="{{ url_for('dashboard.index') }}" class="brand-info text-decoration-none text-white">
+                <i class="fa-solid fa-boxes-stacked brand-icon"></i>
+                <span>SmartLogix</span>
+            </a>
+            <button class="sidebar-close-btn" id="sidebarClose" type="button" aria-label="Close Sidebar">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
 
         <ul class="sidebar-nav">
             <li class="sidebar-section-title">Core Operations</li>
@@ -126,14 +146,19 @@
     <div id="content">
         <!-- Top Navbar -->
         <header class="top-navbar no-print">
-            <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-sm btn-light border d-md-none" id="sidebarToggle" type="button">
+            <div class="d-flex align-items-center gap-2 gap-sm-3">
+                <button class="btn btn-sm btn-light border d-lg-none" id="sidebarToggle" type="button" aria-label="Toggle Sidebar">
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
             </div>
 
             <div class="navbar-actions">
+                <!-- Dark / Light Theme Toggle -->
+                <button class="theme-toggle-btn" id="themeToggle" type="button" aria-label="Toggle Dark/Light Mode" title="Toggle Theme">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+
                 <!-- Notifications Bell -->
                 <a href="{{ url_for('notifications.index') }}" class="notification-badge" title="Notifications">
                     <i class="fa-regular fa-bell"></i>
@@ -161,7 +186,7 @@
         </header>
 
         <!-- Flash Messages -->
-        <div class="px-4 pt-3 no-print">
+        <div class="px-3 px-md-4 pt-3 no-print">
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
@@ -181,7 +206,7 @@
         </main>
 
         <!-- Footer -->
-        <footer class="bg-white border-top py-3 px-4 text-muted small d-flex justify-content-between align-items-center no-print">
+        <footer class="app-footer no-print">
             <span>&copy; {{ now.year }} SmartLogix - Inventory & Logistics Management System.</span>
             <span><i class="fa-solid fa-shield-halved text-primary me-1"></i> Secured Role-Based System</span>
         </footer>
